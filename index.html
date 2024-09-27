@@ -65,17 +65,19 @@ ________________________________________________________________________________
     </div>
 
     <script>
-        // Lista de estados e municípios (valores preenchidos dinamicamente)
-        const estados = ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO'];
+        // Dicionário contendo estados e seus respectivos municípios
         const municipiosPorEstado = {
-            'RO': ['Alta Floresta D´oeste', 'Alto Alegre Dos Parecis', 'Alto Paraíso', 'Alvorada D´oeste', 'Ariquemes'],
+            'AC': ['Acrelândia', 'Assis Brasil', 'Brasiléia', 'Bujari', 'Capixaba', 'Cruzeiro do Sul', 'Epitaciolândia', 'Feijó', 'Jordão', 'Manoel Urbano', 'Marechal Thaumaturgo', 'Mâncio Lima', 'Plácido de Castro', 'Porto Acre', 'Porto Walter', 'Rio Branco', 'Rodrigues Alves', 'Santa Rosa do Purus', 'Sena Madureira', 'Senador Guiomard', 'Tarauacá', 'Xapuri'],
+            'AL': ['Anadia', 'Arapiraca', 'Atalaia', 'Barra de Santo Antônio', 'Barra de São Miguel', 'Batalha', 'Belo Monte', 'Belém', 'Boca da Mata', 'Branquinha', 'Cacimbinhas', 'Cajueiro', 'Campestre', 'Campo Alegre', 'Campo Grande', 'Canapi', 'Capela', 'Carneiros', 'Chã Preta', 'Coité do Nóia'],
             // Adicione todos os municípios dos outros estados aqui
         };
 
-        // Função para preencher a lista de estados
+        // Preencher a lista de estados dinamicamente
         function preencherEstados() {
             const estadoSelect = document.getElementById('estado');
-            estados.sort().forEach(estado => {
+            const estados = Object.keys(municipiosPorEstado).sort();
+
+            estados.forEach(estado => {
                 const option = document.createElement('option');
                 option.value = estado;
                 option.textContent = estado;
@@ -83,7 +85,7 @@ ________________________________________________________________________________
             });
         }
 
-        // Função para atualizar os municípios quando um estado é selecionado
+        // Atualizar a lista de municípios com base no estado selecionado
         function atualizarMunicipios() {
             const estadoSelect = document.getElementById('estado');
             const municipioSelect = document.getElementById('municipio');
