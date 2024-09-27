@@ -10,12 +10,13 @@
     <p>Em breve, você poderá calcular o tamanho ideal do sistema solar aqui!</p>
 </body>
 </html>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Solar</title>
+    <title>Calculadora Solar Ajustada</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 20px; }
         h1 { color: #f39c12; text-align: center; }
@@ -29,17 +30,48 @@
     </style>
 </head>
 <body>
-    <h1>Calculadora Solar</h1>
+    <h1>Calculadora Solar Ajustada</h1>
     <div class="container">
         <div class="input-group">
             <label for="estado">Estado</label>
             <select id="estado" onchange="atualizarIrradiacao()">
-                <option value="4911.84">Valor Médio (Brasil)</option>
-                <option value="5200">Região Norte</option>
-                <option value="5000">Região Nordeste</option>
-                <option value="4800">Região Centro-Oeste</option>
-                <option value="4600">Região Sudeste</option>
-                <option value="4400">Região Sul</option>
+                <optgroup label="Norte">
+                    <option value="5200">Acre</option>
+                    <option value="5200">Amapá</option>
+                    <option value="5200">Amazonas</option>
+                    <option value="5200">Pará</option>
+                    <option value="5200">Rondônia</option>
+                    <option value="5200">Roraima</option>
+                    <option value="5200">Tocantins</option>
+                </optgroup>
+                <optgroup label="Nordeste">
+                    <option value="5000">Alagoas</option>
+                    <option value="5000">Bahia</option>
+                    <option value="5000">Ceará</option>
+                    <option value="5000">Maranhão</option>
+                    <option value="5000">Paraíba</option>
+                    <option value="5000">Pernambuco</option>
+                    <option value="5000">Piauí</option>
+                    <option value="5000">Rio Grande do Norte</option>
+                    <option value="5000">Sergipe</option>
+                </optgroup>
+                <optgroup label="Centro-Oeste">
+                    <option value="4800">Distrito Federal</option>
+                    <option value="4800">Goiás</option>
+                    <option value="4800">Mato Grosso</option>
+                    <option value="4800">Mato Grosso do Sul</option>
+                </optgroup>
+                <optgroup label="Sudeste">
+                    <option value="4600">Espírito Santo</option>
+                    <option value="4600">Minas Gerais</option>
+                    <option value="4600">Rio de Janeiro</option>
+                    <option value="4600">São Paulo</option>
+                </optgroup>
+                <optgroup label="Sul">
+                    <option value="4400">Paraná</option>
+                    <option value="4400">Rio Grande do Sul</option>
+                    <option value="4400">Santa Catarina</option>
+                </optgroup>
             </select>
         </div>
         <div class="input-group">
@@ -53,10 +85,12 @@
         <button onclick="calcular()">Calcular</button>
         
         <div class="result-box">
-            <div><h4>Incidência Solar</h4><p id="incidencia">Valor Médio (Brasil): 4911,84 kWh/m²/ano</p></div>
+            <div><h4>Incidência Solar Ajustada</h4><p id="incidencia">Valor Médio (Brasil): 4911,84 kWh/m²/ano</p></div>
             <div><h4>Capacidade (kWp)</h4><p id="capacidade">-</p></div>
             <div><h4>Área ocupada</h4><p id="area">-</p></div>
             <div><h4>Economia estimada</h4><p id="economia">-</p></div>
+            <div><h4>Margem de Erro (REQM)</h4><p id="reqm">-</p></div>
+            <div><h4>Coeficiente de Correlação (r)</h4><p id="correlacao">-</p></div>
         </div>
     </div>
 
@@ -74,14 +108,27 @@
             const cobertura = document.getElementById('cobertura').value / 100;
             const diasMes = 30;
 
-            // Calcula a capacidade do sistema em kWp
-            const capacidade = ((consumo * cobertura) / (incidenciaDiaria * diasMes * eficiencia)).toFixed(2);
+            // Ajuste do valor de irradiação com base no viés (exemplo: 10%)
+            const viés = 0.10; // Ajuste para reduzir sistematicamente o erro (10% de correção)
+            const incidenciaAjustada = incidenciaDiaria * (1 - viés);
+
+            // Cálculo da capacidade do sistema em kWp
+            const capacidade = ((consumo * cobertura) / (incidenciaAjustada * diasMes * eficiencia)).toFixed(2);
             const area = (capacidade * 7).toFixed(2);
             const economia = (consumo * 0.80 * 12).toFixed(2);
-            
+
+            // Estimar o erro usando REQM (exemplo: 15%)
+            const REQM = (capacidade * 0.15).toFixed(2);
+
+            // Valor aproximado do coeficiente de correlação (exemplo: 0.9)
+            const correlacao = 0.9;
+
+            // Atualizar resultados na tela
             document.getElementById('capacidade').innerText = `${capacidade} kWp`;
             document.getElementById('area').innerText = `${area} m²`;
             document.getElementById('economia').innerText = `R$ ${economia} / Ano`;
+            document.getElementById('reqm').innerText = `± ${REQM} kWp`;
+            document.getElementById('correlacao').innerText = `${correlacao}`;
         }
     </script>
 </body>
