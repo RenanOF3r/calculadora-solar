@@ -6,7 +6,83 @@
     <title>Calculadora de Energia Solar</title>
 </head>
 <body>
-    <h1>Bem-vindo à Calculadora de Energia Solar</h1>
+    <h1>Bem-vindo à Calculadora da RF Energia Solar</h1>
     <p>Em breve, você poderá calcular o tamanho ideal do sistema solar aqui!</p>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Solar</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 20px; }
+        h1 { color: #f39c12; text-align: center; }
+        .container { max-width: 900px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="number"], select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .result-box { display: flex; flex-wrap: wrap; justify-content: space-between; margin-top: 20px; }
+        .result-box div { width: 48%; background-color: #f0f4f7; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
+        button { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Calculadora Solar</h1>
+    <div class="container">
+        <div class="input-group">
+            <label for="estado">Estado</label>
+            <select id="estado" onchange="atualizarIrradiacao()">
+                <option value="4911.84">Valor Médio (Brasil)</option>
+                <option value="5200">Região Norte</option>
+                <option value="5000">Região Nordeste</option>
+                <option value="4800">Região Centro-Oeste</option>
+                <option value="4600">Região Sudeste</option>
+                <option value="4400">Região Sul</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="consumo">Consumo médio mensal (kWh)</label>
+            <input type="number" id="consumo" placeholder="Digite seu consumo mensal">
+        </div>
+        <div class="input-group">
+            <label for="cobertura">Cobertura desejada (%)</label>
+            <input type="number" id="cobertura" value="100" max="100" min="0">
+        </div>
+        <button onclick="calcular()">Calcular</button>
+        
+        <div class="result-box">
+            <div><h4>Incidência Solar</h4><p id="incidencia">Valor Médio (Brasil): 4911,84 kWh/m²/ano</p></div>
+            <div><h4>Capacidade (kWp)</h4><p id="capacidade">-</p></div>
+            <div><h4>Área ocupada</h4><p id="area">-</p></div>
+            <div><h4>Economia estimada</h4><p id="economia">-</p></div>
+        </div>
+    </div>
+
+    <script>
+        function atualizarIrradiacao() {
+            const incidencia = document.getElementById('estado').value;
+            document.getElementById('incidencia').innerText = `Valor Selecionado: ${incidencia} kWh/m²/ano`;
+        }
+
+        function calcular() {
+            const consumo = document.getElementById('consumo').value;
+            const incidenciaAnual = parseFloat(document.getElementById('estado').value);
+            const incidenciaDiaria = incidenciaAnual / 365; // Convertendo irradiação anual para diária
+            const eficiencia = 0.8; 
+            const cobertura = document.getElementById('cobertura').value / 100;
+            const diasMes = 30;
+
+            // Calcula a capacidade do sistema em kWp
+            const capacidade = ((consumo * cobertura) / (incidenciaDiaria * diasMes * eficiencia)).toFixed(2);
+            const area = (capacidade * 7).toFixed(2);
+            const economia = (consumo * 0.80 * 12).toFixed(2);
+            
+            document.getElementById('capacidade').innerText = `${capacidade} kWp`;
+            document.getElementById('area').innerText = `${area} m²`;
+            document.getElementById('economia').innerText = `R$ ${economia} / Ano`;
+        }
+    </script>
 </body>
 </html>
