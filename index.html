@@ -35,15 +35,9 @@ ________________________________________________________________________________
     <div class="container">
         <div class="input-group">
             <label for="estado">Estado</label>
-            <select id="estado" onchange="atualizarMunicipios()">
+            <select id="estado" onchange="atualizarIrradiacao()">
                 <option value="" disabled selected>Selecione seu estado</option>
                 <!-- Estados serão preenchidos dinamicamente pelo JavaScript -->
-            </select>
-        </div>
-        <div class="input-group">
-            <label for="municipio">Município</label>
-            <select id="municipio" disabled>
-                <option value="" disabled selected>Selecione seu município</option>
             </select>
         </div>
         <div class="input-group">
@@ -65,45 +59,55 @@ ________________________________________________________________________________
     </div>
 
     <script>
-        // Dicionário contendo estados e seus respectivos municípios
-        const municipiosPorEstado = {
-            'AC': ['Acrelândia', 'Assis Brasil', 'Brasiléia', 'Bujari', 'Capixaba', 'Cruzeiro do Sul', 'Epitaciolândia', 'Feijó', 'Jordão', 'Manoel Urbano', 'Marechal Thaumaturgo', 'Mâncio Lima', 'Plácido de Castro', 'Porto Acre', 'Porto Walter', 'Rio Branco', 'Rodrigues Alves', 'Santa Rosa do Purus', 'Sena Madureira', 'Senador Guiomard', 'Tarauacá', 'Xapuri'],
-            'AL': ['Anadia', 'Arapiraca', 'Atalaia', 'Barra de Santo Antônio', 'Barra de São Miguel', 'Batalha', 'Belo Monte', 'Belém', 'Boca da Mata', 'Branquinha', 'Cacimbinhas', 'Cajueiro', 'Campestre', 'Campo Alegre', 'Campo Grande', 'Canapi', 'Capela', 'Carneiros', 'Chã Preta', 'Coité do Nóia'],
-            // Adicione todos os municípios dos outros estados aqui
+        // Lista de estados e seus respectivos valores de incidência solar (valores fictícios para simplificação)
+        const estados = {
+            'AC': 5200,
+            'AL': 5000,
+            'AM': 5200,
+            'AP': 5200,
+            'BA': 5000,
+            'CE': 5000,
+            'DF': 4800,
+            'ES': 4600,
+            'GO': 4800,
+            'MA': 5000,
+            'MG': 4600,
+            'MS': 4800,
+            'MT': 4800,
+            'PA': 5200,
+            'PB': 5000,
+            'PE': 5000,
+            'PI': 5000,
+            'PR': 4400,
+            'RJ': 4600,
+            'RN': 5000,
+            'RO': 5200,
+            'RR': 5200,
+            'RS': 4400,
+            'SC': 4400,
+            'SE': 5000,
+            'SP': 4600,
+            'TO': 5200
         };
 
-        // Preencher a lista de estados dinamicamente
+        // Função para preencher a lista de estados
         function preencherEstados() {
             const estadoSelect = document.getElementById('estado');
-            const estados = Object.keys(municipiosPorEstado).sort();
+            const estadosOrdenados = Object.keys(estados).sort();
 
-            estados.forEach(estado => {
+            estadosOrdenados.forEach(estado => {
                 const option = document.createElement('option');
-                option.value = estado;
+                option.value = estados[estado];
                 option.textContent = estado;
                 estadoSelect.appendChild(option);
             });
         }
 
-        // Atualizar a lista de municípios com base no estado selecionado
-        function atualizarMunicipios() {
+        // Função para atualizar a incidência solar selecionada
+        function atualizarIrradiacao() {
             const estadoSelect = document.getElementById('estado');
-            const municipioSelect = document.getElementById('municipio');
-            const estadoSelecionado = estadoSelect.value;
-
-            // Limpar e habilitar o campo de município
-            municipioSelect.innerHTML = '<option value="" disabled selected>Selecione seu município</option>';
-            municipioSelect.disabled = false;
-
-            // Adicionar os municípios do estado selecionado
-            const municipios = municipiosPorEstado[estadoSelecionado] || [];
-            municipios.sort();
-            municipios.forEach(municipio => {
-                const option = document.createElement('option');
-                option.value = municipio;
-                option.textContent = municipio;
-                municipioSelect.appendChild(option);
-            });
+            const incidencia = estadoSelect.value;
+            document.getElementById('incidencia').innerText = `Valor Selecionado: ${incidencia} kWh/m²/ano`;
         }
 
         // Chamada inicial para preencher a lista de estados
@@ -134,3 +138,4 @@ ________________________________________________________________________________
     </script>
 </body>
 </html>
+
