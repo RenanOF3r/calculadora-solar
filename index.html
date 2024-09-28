@@ -116,6 +116,10 @@ ________________________________________________________________________________
         function calcular() {
             const consumo = document.getElementById('consumo').value;
             const incidenciaAnual = parseFloat(document.getElementById('estado').value);
+            if (isNaN(incidenciaAnual)) {
+                alert("Por favor, selecione um estado.");
+                return;
+            }
             const incidenciaDiaria = incidenciaAnual / 365; // Convertendo irradiação anual para diária
             const eficiencia = 0.8; 
             const cobertura = document.getElementById('cobertura').value / 100;
@@ -138,4 +142,3 @@ ________________________________________________________________________________
     </script>
 </body>
 </html>
-
