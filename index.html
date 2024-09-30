@@ -37,34 +37,33 @@ ________________________________________________________________________________
             <label for="estado">Estado</label>
             <select id="estado" onchange="atualizarIrradiacao()">
                 <option value="" disabled selected>Selecione seu estado</option>
-                <!-- Estados preenchidos dinamicamente com valores de irradiação regional -->
-                <option value="4.20">Paraná (PR)</option>
-                <option value="4.20">Rio Grande do Sul (RS)</option>
-                <option value="4.20">Santa Catarina (SC)</option>
+                <!-- Estados em ordem alfabética com valores de irradiação regional -->
                 <option value="4.55">Acre (AC)</option>
+                <option value="5.60">Alagoas (AL)</option>
                 <option value="4.55">Amapá (AP)</option>
                 <option value="4.55">Amazonas (AM)</option>
-                <option value="4.55">Pará (PA)</option>
-                <option value="4.55">Rondônia (RO)</option>
-                <option value="4.55">Roraima (RR)</option>
-                <option value="4.55">Tocantins (TO)</option>
+                <option value="5.60">Bahia (BA)</option>
                 <option value="5.25">Distrito Federal (DF)</option>
+                <option value="4.55">Espírito Santo (ES)</option>
                 <option value="5.25">Goiás (GO)</option>
+                <option value="5.60">Maranhão (MA)</option>
                 <option value="5.25">Mato Grosso (MT)</option>
                 <option value="5.25">Mato Grosso do Sul (MS)</option>
-                <option value="4.55">Espírito Santo (ES)</option>
                 <option value="4.55">Minas Gerais (MG)</option>
-                <option value="4.55">Rio de Janeiro (RJ)</option>
-                <option value="4.55">São Paulo (SP)</option>
-                <option value="5.60">Alagoas (AL)</option>
-                <option value="5.60">Bahia (BA)</option>
-                <option value="5.60">Ceará (CE)</option>
-                <option value="5.60">Maranhão (MA)</option>
+                <option value="5.60">Pará (PA)</option>
+                <option value="4.20">Paraná (PR)</option>
                 <option value="5.60">Paraíba (PB)</option>
                 <option value="5.60">Pernambuco (PE)</option>
                 <option value="5.60">Piauí (PI)</option>
+                <option value="4.20">Rio Grande do Sul (RS)</option>
+                <option value="4.55">Rio de Janeiro (RJ)</option>
                 <option value="5.60">Rio Grande do Norte (RN)</option>
+                <option value="4.55">Rondônia (RO)</option>
+                <option value="4.55">Roraima (RR)</option>
+                <option value="4.20">Santa Catarina (SC)</option>
+                <option value="4.55">São Paulo (SP)</option>
                 <option value="5.60">Sergipe (SE)</option>
+                <option value="4.55">Tocantins (TO)</option>
             </select>
         </div>
         <div class="input-group">
@@ -105,20 +104,20 @@ ________________________________________________________________________________
             const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
             const eficiencia = 0.8;  // Considerando 80% de eficiência do sistema
 
-            if (isNaN(incidenciaDiaria)) {
-                alert("Por favor, selecione um estado.");
+            if (isNaN(incidenciaDiaria) || isNaN(consumo)) {
+                alert("Por favor, preencha todos os campos corretamente.");
                 return;
             }
 
             const diasMes = 30;
 
-            // Produção mensal por kWp
+            // Produção mensal por kWp considerando eficiência
             const producaoMensalPorKwp = incidenciaDiaria * diasMes * eficiencia;
 
             // Cálculo da capacidade do sistema em kWp
             const capacidade = (consumo / producaoMensalPorKwp).toFixed(2);
-            const area = (capacidade * 7).toFixed(2);
-            const economia = (consumo * 0.80 * 12).toFixed(2);
+            const area = (capacidade * 7).toFixed(2); // Área aproximada ocupada por kWp
+            const economia = (consumo * 0.80 * 12).toFixed(2); // Economia anual estimada
 
             // Atualizar resultados na tela
             document.getElementById('capacidade').innerText = `${capacidade} kWp`;
@@ -128,4 +127,3 @@ ________________________________________________________________________________
     </script>
 </body>
 </html>
-
