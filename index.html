@@ -51,8 +51,8 @@ ________________________________________________________________________________
                 <option value="5.25">Mato Grosso do Sul (MS)</option>
                 <option value="4.55">Minas Gerais (MG)</option>
                 <option value="5.60">Pará (PA)</option>
-                <option value="4.20">Paraná (PR)</option>
                 <option value="5.60">Paraíba (PB)</option>
+                <option value="4.20">Paraná (PR)</option>
                 <option value="5.60">Pernambuco (PE)</option>
                 <option value="5.60">Piauí (PI)</option>
                 <option value="4.55">Rio de Janeiro (RJ)</option>
@@ -116,7 +116,7 @@ ________________________________________________________________________________
             const producaoMensalPorKwp = incidenciaDiaria * diasMes * eficiencia;
 
             // Cálculo da capacidade do sistema em kWp
-            const capacidade = (consumo / producaoMensalPorKwp).toFixed(2);
+            const capacidade = ((consumo / producaoMensalPorKwp) * cobertura).toFixed(2);
 
             // Calculando o número de painéis necessários (painel de 550W = 0.55 kWp)
             const capacidadePorPainel = 0.55; // kWp
