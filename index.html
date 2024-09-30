@@ -24,7 +24,8 @@ ________________________________________________________________________________
         .container { max-width: 900px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
         .input-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="number"], select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        input[type="number"], select, input[type="range"] { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .slider-value { text-align: right; font-weight: bold; }
         .result-box { display: flex; flex-wrap: wrap; justify-content: space-between; margin-top: 20px; }
         .result-box div { width: 48%; background-color: #f0f4f7; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
         button { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
@@ -37,7 +38,6 @@ ________________________________________________________________________________
             <label for="estado">Estado</label>
             <select id="estado" onchange="atualizarIrradiacao()">
                 <option value="" disabled selected>Selecione seu estado</option>
-                <!-- Estados em ordem alfabética com valores de irradiação regional -->
                 <option value="4.55">Acre (AC)</option>
                 <option value="5.60">Alagoas (AL)</option>
                 <option value="4.55">Amapá (AP)</option>
@@ -67,16 +67,14 @@ ________________________________________________________________________________
             </select>
         </div>
         <div class="input-group">
-            <label for="consumo">Consumo médio mensal (kWh)</label>
-            <input type="number" id="consumo" placeholder="Digite seu consumo mensal">
-        </div>
-        <div class="input-group">
             <label for="cobertura">Cobertura desejada (%)</label>
-            <input type="number" id="cobertura" value="100" max="100" min="0">
+            <input type="range" id="cobertura" value="100" max="100" min="0" oninput="atualizarValor('cobertura')">
+            <div class="slider-value" id="valor-cobertura">100%</div>
         </div>
         <div class="input-group">
             <label for="simultaneidade">Simultaneidade do Consumo (%)</label>
-            <input type="number" id="simultaneidade" value="70" max="100" min="0">
+            <input type="range" id="simultaneidade" value="70" max="100" min="0" oninput="atualizarValor('simultaneidade')">
+            <div class="slider-value" id="valor-simultaneidade">70%</div>
         </div>
         <button onclick="calcular()">Calcular</button>
         
@@ -97,6 +95,12 @@ ________________________________________________________________________________
             document.getElementById('incidencia').innerText = `Valor Selecionado: ${incidencia} kWh/m²/dia`;
         }
 
+        // Função para atualizar o valor dos sliders de cobertura e simultaneidade
+        function atualizarValor(id) {
+            const valor = document.getElementById(id).value;
+            document.getElementById(`valor-${id}`).innerText = `${valor}%`;
+        }
+
         // Função para calcular a capacidade necessária do sistema solar
         function calcular() {
             const consumo = parseFloat(document.getElementById('consumo').value);
@@ -115,7 +119,7 @@ ________________________________________________________________________________
             // Produção mensal por kWp considerando eficiência
             const producaoMensalPorKwp = incidenciaDiaria * diasMes * eficiencia;
 
-            // Cálculo da capacidade do sistema em kWp
+            // Cálculo da capacidade do sistema em kWp (não considerando simultaneidade para o dimensionamento)
             const capacidade = ((consumo / producaoMensalPorKwp) * cobertura).toFixed(2);
 
             // Calculando o número de painéis necessários (painel de 550W = 0.55 kWp)
@@ -128,8 +132,8 @@ ________________________________________________________________________________
             const areaPorPainel = larguraPainel * alturaPainel;
             const areaTotal = (numeroDePaineis * areaPorPainel).toFixed(2); // Área total ocupada
 
-            // Cálculo da economia anual estimada
-            const economia = (consumo * 0.80 * 12).toFixed(2); // Economia anual estimada
+            // Cálculo da economia anual estimada considerando 70% do consumo ocorrendo simultaneamente
+            const economia = (consumo * simultaneidade * 12).toFixed(2); // Economia anual estimada
 
             // Atualizar resultados na tela
             document.getElementById('capacidade').innerText = `${capacidade} kWp`;
