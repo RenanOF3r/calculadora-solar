@@ -103,6 +103,7 @@ ________________________________________________________________________________
             const incidenciaDiaria = parseFloat(document.getElementById('estado').value);
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
             const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
+            const eficiencia = 0.8;  // Considerando 80% de eficiência do sistema
 
             if (isNaN(incidenciaDiaria)) {
                 alert("Por favor, selecione um estado.");
@@ -111,14 +112,11 @@ ________________________________________________________________________________
 
             const diasMes = 30;
 
-            // Considerar simultaneidade no cálculo do consumo efetivo
-            const consumoEfetivo = consumo * simultaneidade;
-
             // Produção mensal por kWp
-            const producaoMensalPorKwp = incidenciaDiaria * diasMes;
+            const producaoMensalPorKwp = incidenciaDiaria * diasMes * eficiencia;
 
             // Cálculo da capacidade do sistema em kWp
-            const capacidade = (consumoEfetivo / producaoMensalPorKwp).toFixed(2);
+            const capacidade = (consumo / producaoMensalPorKwp).toFixed(2);
             const area = (capacidade * 7).toFixed(2);
             const economia = (consumo * 0.80 * 12).toFixed(2);
 
@@ -130,3 +128,4 @@ ________________________________________________________________________________
     </script>
 </body>
 </html>
+
