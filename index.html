@@ -81,6 +81,10 @@ ________________________________________________________________________________
             <input type="range" id="simultaneidade" value="70" max="100" min="0" oninput="atualizarValor('simultaneidade')">
             <div class="slider-value" id="valor-simultaneidade">70%</div>
         </div>
+        <div class="input-group">
+            <label for="tarifa">Tarifa de Energia (R$/kWh)</label>
+            <input type="number" id="tarifa" placeholder="Digite a tarifa de energia em R$/kWh">
+        </div>
         <button onclick="calcular()">Calcular</button>
         
         <div class="result-box">
@@ -112,9 +116,10 @@ ________________________________________________________________________________
             const incidenciaDiaria = parseFloat(document.getElementById('estado').value);
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
             const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
+            const tarifa = parseFloat(document.getElementById('tarifa').value);
             const eficiencia = 0.8;  // Considerando 80% de eficiência do sistema
 
-            if (isNaN(incidenciaDiaria) || isNaN(consumo)) {
+            if (isNaN(incidenciaDiaria) || isNaN(consumo) || isNaN(tarifa)) {
                 alert("Por favor, preencha todos os campos corretamente.");
                 return;
             }
@@ -129,24 +134,4 @@ ________________________________________________________________________________
 
             // Calculando o número de painéis necessários (painel de 550W = 0.55 kWp)
             const capacidadePorPainel = 0.55; // kWp
-            const numeroDePaineis = Math.ceil(capacidade / capacidadePorPainel);
-
-            // Calculando a área ocupada pelos painéis (em metros quadrados)
-            const larguraPainel = 1.134; // metros
-            const alturaPainel = 2.278; // metros
-            const areaPorPainel = larguraPainel * alturaPainel;
-            const areaTotal = (numeroDePaineis * areaPorPainel).toFixed(2); // Área total ocupada
-
-            // Cálculo da economia anual estimada considerando 70% do consumo ocorrendo simultaneamente
-            const economia = (consumo * simultaneidade * 12).toFixed(2); // Economia anual estimada
-
-            // Atualizar resultados na tela
-            document.getElementById('capacidade').innerText = `${capacidade} kWp`;
-            document.getElementById('paineis').innerText = `${numeroDePaineis} painéis de 550W`;
-            document.getElementById('area').innerText = `${areaTotal} m²`;
-            document.getElementById('economia').innerText = `R$ ${economia} / Ano`;
-        }
-    </script>
-</body>
-</html>
-
+            const
