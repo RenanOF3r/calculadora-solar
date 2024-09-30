@@ -55,9 +55,9 @@ ________________________________________________________________________________
                 <option value="5.60">Paraíba (PB)</option>
                 <option value="5.60">Pernambuco (PE)</option>
                 <option value="5.60">Piauí (PI)</option>
-                <option value="4.20">Rio Grande do Sul (RS)</option>
                 <option value="4.55">Rio de Janeiro (RJ)</option>
                 <option value="5.60">Rio Grande do Norte (RN)</option>
+                <option value="4.20">Rio Grande do Sul (RS)</option>
                 <option value="4.55">Rondônia (RO)</option>
                 <option value="4.55">Roraima (RR)</option>
                 <option value="4.20">Santa Catarina (SC)</option>
@@ -83,6 +83,7 @@ ________________________________________________________________________________
         <div class="result-box">
             <div><h4>Incidência Solar Ajustada</h4><p id="incidencia">Valor Médio (Brasil): 4911,84 kWh/m²/ano</p></div>
             <div><h4>Capacidade (kWp)</h4><p id="capacidade">-</p></div>
+            <div><h4>Quantidade de Painéis</h4><p id="paineis">-</p></div>
             <div><h4>Área ocupada</h4><p id="area">-</p></div>
             <div><h4>Economia estimada</h4><p id="economia">-</p></div>
         </div>
@@ -116,12 +117,24 @@ ________________________________________________________________________________
 
             // Cálculo da capacidade do sistema em kWp
             const capacidade = (consumo / producaoMensalPorKwp).toFixed(2);
-            const area = (capacidade * 7).toFixed(2); // Área aproximada ocupada por kWp
+
+            // Calculando o número de painéis necessários (painel de 550W = 0.55 kWp)
+            const capacidadePorPainel = 0.55; // kWp
+            const numeroDePaineis = Math.ceil(capacidade / capacidadePorPainel);
+
+            // Calculando a área ocupada pelos painéis (em metros quadrados)
+            const larguraPainel = 1.134; // metros
+            const alturaPainel = 2.278; // metros
+            const areaPorPainel = larguraPainel * alturaPainel;
+            const areaTotal = (numeroDePaineis * areaPorPainel).toFixed(2); // Área total ocupada
+
+            // Cálculo da economia anual estimada
             const economia = (consumo * 0.80 * 12).toFixed(2); // Economia anual estimada
 
             // Atualizar resultados na tela
             document.getElementById('capacidade').innerText = `${capacidade} kWp`;
-            document.getElementById('area').innerText = `${area} m²`;
+            document.getElementById('paineis').innerText = `${numeroDePaineis} painéis de 550W`;
+            document.getElementById('area').innerText = `${areaTotal} m²`;
             document.getElementById('economia').innerText = `R$ ${economia} / Ano`;
         }
     </script>
