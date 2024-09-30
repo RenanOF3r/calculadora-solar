@@ -37,7 +37,34 @@ ________________________________________________________________________________
             <label for="estado">Estado</label>
             <select id="estado" onchange="atualizarIrradiacao()">
                 <option value="" disabled selected>Selecione seu estado</option>
-                <!-- Estados serão preenchidos dinamicamente pelo JavaScript -->
+                <!-- Estados preenchidos dinamicamente com valores de irradiação regional -->
+                <option value="4.20">Paraná (PR)</option>
+                <option value="4.20">Rio Grande do Sul (RS)</option>
+                <option value="4.20">Santa Catarina (SC)</option>
+                <option value="4.55">Acre (AC)</option>
+                <option value="4.55">Amapá (AP)</option>
+                <option value="4.55">Amazonas (AM)</option>
+                <option value="4.55">Pará (PA)</option>
+                <option value="4.55">Rondônia (RO)</option>
+                <option value="4.55">Roraima (RR)</option>
+                <option value="4.55">Tocantins (TO)</option>
+                <option value="5.25">Distrito Federal (DF)</option>
+                <option value="5.25">Goiás (GO)</option>
+                <option value="5.25">Mato Grosso (MT)</option>
+                <option value="5.25">Mato Grosso do Sul (MS)</option>
+                <option value="4.55">Espírito Santo (ES)</option>
+                <option value="4.55">Minas Gerais (MG)</option>
+                <option value="4.55">Rio de Janeiro (RJ)</option>
+                <option value="4.55">São Paulo (SP)</option>
+                <option value="5.60">Alagoas (AL)</option>
+                <option value="5.60">Bahia (BA)</option>
+                <option value="5.60">Ceará (CE)</option>
+                <option value="5.60">Maranhão (MA)</option>
+                <option value="5.60">Paraíba (PB)</option>
+                <option value="5.60">Pernambuco (PE)</option>
+                <option value="5.60">Piauí (PI)</option>
+                <option value="5.60">Rio Grande do Norte (RN)</option>
+                <option value="5.60">Sergipe (SE)</option>
             </select>
         </div>
         <div class="input-group">
@@ -63,72 +90,25 @@ ________________________________________________________________________________
     </div>
 
     <script>
-        // Lista de estados e seus respectivos valores de incidência solar (valores fictícios para simplificação)
-        const estados = {
-            'AC': 5200,
-            'AL': 5000,
-            'AM': 5200,
-            'AP': 5200,
-            'BA': 5000,
-            'CE': 5000,
-            'DF': 4800,
-            'ES': 4600,
-            'GO': 4800,
-            'MA': 5000,
-            'MG': 4600,
-            'MS': 4800,
-            'MT': 4800,
-            'PA': 5200,
-            'PB': 5000,
-            'PE': 5000,
-            'PI': 5000,
-            'PR': 4400,
-            'RJ': 4600,
-            'RN': 5000,
-            'RO': 5200,
-            'RR': 5200,
-            'RS': 4400,
-            'SC': 4400,
-            'SE': 5000,
-            'SP': 4600,
-            'TO': 5200
-        };
-
-        // Função para preencher a lista de estados
-        function preencherEstados() {
-            const estadoSelect = document.getElementById('estado');
-            const estadosOrdenados = Object.keys(estados).sort();
-
-            estadosOrdenados.forEach(estado => {
-                const option = document.createElement('option');
-                option.value = estados[estado];
-                option.textContent = estado;
-                estadoSelect.appendChild(option);
-            });
-        }
-
         // Função para atualizar a incidência solar selecionada
         function atualizarIrradiacao() {
             const estadoSelect = document.getElementById('estado');
             const incidencia = estadoSelect.value;
-            document.getElementById('incidencia').innerText = `Valor Selecionado: ${incidencia} kWh/m²/ano`;
+            document.getElementById('incidencia').innerText = `Valor Selecionado: ${incidencia} kWh/m²/dia`;
         }
 
-        // Chamada inicial para preencher a lista de estados
-        preencherEstados();
-
+        // Função para calcular a capacidade necessária do sistema solar
         function calcular() {
             const consumo = parseFloat(document.getElementById('consumo').value);
-            const incidenciaAnual = parseFloat(document.getElementById('estado').value);
+            const incidenciaDiaria = parseFloat(document.getElementById('estado').value);
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
             const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
 
-            if (isNaN(incidenciaAnual)) {
+            if (isNaN(incidenciaDiaria)) {
                 alert("Por favor, selecione um estado.");
                 return;
             }
 
-            const incidenciaDiaria = incidenciaAnual / 365; // Convertendo irradiação anual para diária
             const diasMes = 30;
 
             // Considerar simultaneidade no cálculo do consumo efetivo
@@ -150,4 +130,3 @@ ________________________________________________________________________________
     </script>
 </body>
 </html>
-
