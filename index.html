@@ -190,6 +190,11 @@ ________________________________________________________________________________
             <div class="slider-value" id="valor-cobertura">100%</div>
         </div>
         <div class="input-group">
+            <label for="excedente">Excedente Desejado (%)</label>
+            <input type="number" id="excedente" value="0" min="0" max="100" step="5" onchange="atualizarValor('excedente'); calcular()">
+            <div class="slider-value" id="valor-excedente">Excedente: 0%</div>
+        </div>
+        <div class="input-group">
             <label for="tarifa">Tarifa de Energia (R$/kWh)</label>
             <input type="text" id="tarifa" placeholder="Digite a tarifa de energia (use vírgula para decimais)">
             <span class="error-message" id="erro-tarifa">Por favor, insira um valor válido para a tarifa.</span>
@@ -244,6 +249,7 @@ ________________________________________________________________________________
             const irradiacaoDiaria = 4.55;
             const consumo = converterParaNumero(document.getElementById('consumo').value);
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
+            const excedente = parseFloat(document.getElementById('excedente').value) / 100;
             const tarifa = converterParaNumero(document.getElementById('tarifa').value);
             const eficiencia = 0.8;
 
@@ -264,8 +270,8 @@ ________________________________________________________________________________
             const diasMes = 30;
             const producaoMensalPorKwp = irradiacaoDiaria * diasMes * eficiencia;
 
-            // Capacidade do sistema em kWp
-            const capacidade = (consumo / producaoMensalPorKwp) * cobertura;
+            // Capacidade do sistema em kWp, incluindo o excedente
+            const capacidade = (consumo / producaoMensalPorKwp) * (cobertura + excedente);
             const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
 
             // Quantidade de painéis necessários
@@ -276,7 +282,7 @@ ________________________________________________________________________________
             const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
 
             // Economia anual estimada
-            const economiaAnual = consumo * tarifa * 12 * cobertura;
+            const economiaAnual = consumo * tarifa * 12 * cobertura * (1 + excedente);
             const economiaFormatada = "R$ " + economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " / Ano";
 
             // Atualizar resultados na tela
@@ -284,8 +290,6 @@ ________________________________________________________________________________
             document.getElementById('paineis').innerText = `${numeroDePaineis} painéis de 550W`;
             document.getElementById('area').innerText = areaFormatada;
             document.getElementById('economia').innerText = economiaFormatada;
-
-            document.getElementById('resultados').classList.add('show');
 
             // Atualizar resumo anual e gráfico
             const geracaoAnual = producaoMensalPorKwp * capacidade * 12;
