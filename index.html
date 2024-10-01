@@ -163,6 +163,14 @@ ________________________________________________________________________________
             font-weight: bold;
             color: #2c3e50;
         }
+        .efficiency-box {
+            margin-top: 20px;
+            background-color: #eaf2f8;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -233,6 +241,10 @@ ________________________________________________________________________________
                 <h4>Economia Estimada</h4>
                 <p id="economia">-</p>
             </div>
+        </div>
+        <div class="efficiency-box" id="eficiencia-box" class="hidden">
+            <h3>Eficiência e Custo-Benefício</h3>
+            <p id="eficiencia-detalhes">-</p>
         </div>
     </div>
 
@@ -312,6 +324,86 @@ ________________________________________________________________________________
             document.getElementById('resumo-simultaneidade').innerText = `Consumo Simultâneo: ${consumoSimultaneoAnual.toLocaleString('pt-BR')} kWh`;
             document.getElementById('resumo-media').innerText = `Geração Média Mensal: ${(geracaoAnual / 12).toLocaleString('pt-BR')} kWh/Mês`;
             document.getElementById('resumo').classList.remove('hidden');
+
+            // Atualizar o gráfico de consumo vs geração
+            desenharGraficoConsumoGeracao(consumo, geracaoAnual / 12, consumoSimultaneoAnual / 12);
+
+            // Exibir detalhes de eficiência e custo-benefício
+            const payback = (capacidade * 5000) / economiaAnual;  // Exemplo: custo médio de R$5000/kWp
+            const eficienciaDetalhes = `
+                Com uma capacidade de ${capacidadeFormatada}, o sistema poderá gerar aproximadamente ${geracaoAnual.toLocaleString('pt-BR')} kWh/ano.
+                Estima-se uma economia anual de ${economiaFormatada}, proporcionando um retorno de investimento (payback) em cerca de ${payback.toFixed(1)} anos.
+            `;
+            document.getElementById('eficiencia-detalhes').innerText = eficienciaDetalhes;
+            document.getElementById('eficiencia-box').classList.remove('hidden');
+        }
+
+        function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal, consumoSimultaneoMensal) {
+            const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
+            document.getElementById('graficoConsumoGeracao').classList.add('show');
+
+            const meses = [...Array(12).keys()].map(i => i + 1);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: meses.map(mes => `${mes}`),
+                    datasets: [
+                        {
+                            label: 'CONSUMO KWh',
+                            data: Array(12).fill(consumoMensal),
+                            backgroundColor: 'rgba(231, 76, 60, 0.5)',
+                            borderColor: 'rgba(231, 76, 60, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'GERAÇÃO KWh',
+                            data: Array(12).fill(geracaoMensal),
+                            backgroundColor: 'rgba(46, 204, 113, 0.5)',
+                            borderColor: 'rgba(46, 204, 113, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'CONS. SIMUL. KWh',
+                            data: Array(12).fill(consumoSimultaneoMensal),
+                            type: 'line',
+                            borderColor: 'rgba(52, 152, 219, 1)',
+                            backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                            fill: false,
+                            borderDash: [5, 5],
+                            pointRadius: 5,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Gráfico de Consumo X Geração (Em 12 Meses)'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'kWh/Mês'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Meses'
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function mostrarErro(id, mensagem) {
@@ -327,3 +419,4 @@ ________________________________________________________________________________
     </script>
 </body>
 </html>
+
