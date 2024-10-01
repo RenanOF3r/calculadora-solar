@@ -52,7 +52,7 @@ ________________________________________________________________________________
             font-weight: bold;
             color: #555;
         }
-        input[type="text"], select, input[type="range"] {
+        input[type="text"], select, input[type="range"], input[type="number"] {
             width: 100%;
             padding: 12px;
             margin-bottom: 5px;
@@ -60,7 +60,7 @@ ________________________________________________________________________________
             border-radius: 5px;
             transition: border-color 0.3s;
         }
-        input[type="text"]:focus, select:focus, input[type="range"]:focus {
+        input[type="text"]:focus, select:focus, input[type="range"]:focus, input[type="number"]:focus {
             border-color: #3498db;
         }
         .slider-value {
@@ -163,14 +163,6 @@ ________________________________________________________________________________
             font-weight: bold;
             color: #2c3e50;
         }
-        .efficiency-box {
-            margin-top: 20px;
-            background-color: #eaf2f8;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -206,6 +198,11 @@ ________________________________________________________________________________
             <div class="slider-value" id="valor-simultaneidade">70%</div>
         </div>
         <div class="input-group">
+            <label for="excedente">Excedente Desejado (%)</label>
+            <input type="number" id="excedente" value="0" min="0" max="100" step="5" onchange="calcular()">
+            <span class="slider-value" id="valor-excedente">Excedente: 0%</span>
+        </div>
+        <div class="input-group">
             <label for="tarifa">Tarifa de Energia (R$/kWh)</label>
             <input type="text" id="tarifa" placeholder="Digite a tarifa de energia (use vírgula para decimais)">
             <span class="error-message" id="erro-tarifa">Por favor, insira um valor válido para a tarifa.</span>
@@ -219,32 +216,6 @@ ________________________________________________________________________________
             <div class="summary-item"><span id="resumo-geracao">Geração: - kWh</span></div>
             <div class="summary-item"><span id="resumo-simultaneidade">Consumo Simultâneo: - kWh</span></div>
             <div class="summary-item"><span id="resumo-media">Geração Média Mensal: - kWh/Mês</span></div>
-        </div>
-        <div class="result-box" id="resultados">
-            <div>
-                <i class="fas fa-solar-panel"></i>
-                <h4>Capacidade (kWp)</h4>
-                <p id="capacidade">-</p>
-            </div>
-            <div>
-                <i class="fas fa-th"></i>
-                <h4>Quantidade de Painéis</h4>
-                <p id="paineis">-</p>
-            </div>
-            <div>
-                <i class="fas fa-ruler-combined"></i>
-                <h4>Área Ocupada</h4>
-                <p id="area">-</p>
-            </div>
-            <div>
-                <i class="fas fa-piggy-bank"></i>
-                <h4>Economia Estimada</h4>
-                <p id="economia">-</p>
-            </div>
-        </div>
-        <div class="efficiency-box" id="eficiencia-box" class="hidden">
-            <h3>Eficiência e Custo-Benefício</h3>
-            <p id="eficiencia-detalhes">-</p>
         </div>
     </div>
 
@@ -267,6 +238,7 @@ ________________________________________________________________________________
             const consumo = converterParaNumero(document.getElementById('consumo').value);
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
             const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
+            const excedente = parseFloat(document.getElementById('excedente').value) / 100;
             const tarifa = converterParaNumero(document.getElementById('tarifa').value);
             const eficiencia = 0.8;
 
@@ -292,8 +264,8 @@ ________________________________________________________________________________
             const diasMes = 30;
             const producaoMensalPorKwp = irradiacaoDiaria * diasMes * eficiencia;
 
-            // Capacidade do sistema em kWp
-            const capacidade = (consumo / producaoMensalPorKwp) * cobertura;
+            // Capacidade do sistema em kWp, incluindo o excedente
+            const capacidade = ((consumo / producaoMensalPorKwp) * cobertura) * (1 + excedente);
             const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
 
             // Quantidade de painéis necessários
@@ -304,7 +276,7 @@ ________________________________________________________________________________
             const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
 
             // Economia anual estimada
-            const economiaAnual = consumo * tarifa * 12 * cobertura;
+            const economiaAnual = consumo * tarifa * 12 * cobertura * (1 + excedente);
             const economiaFormatada = "R$ " + economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " / Ano";
 
             // Atualizar resultados na tela
@@ -315,7 +287,7 @@ ________________________________________________________________________________
 
             document.getElementById('resultados').classList.add('show');
 
-            // Atualizar resumo anual
+            // Atualizar resumo anual e gráfico
             const consumoSimultaneoAnual = consumo * 12 * simultaneidade;
             const geracaoAnual = producaoMensalPorKwp * capacidade * 12;
 
@@ -325,17 +297,10 @@ ________________________________________________________________________________
             document.getElementById('resumo-media').innerText = `Geração Média Mensal: ${(geracaoAnual / 12).toLocaleString('pt-BR')} kWh/Mês`;
             document.getElementById('resumo').classList.remove('hidden');
 
-            // Atualizar o gráfico de consumo vs geração
-            desenharGraficoConsumoGeracao(consumo, geracaoAnual / 12, consumoSimultaneoAnual / 12);
-
-            // Exibir detalhes de eficiência e custo-benefício
-            const payback = (capacidade * 5000) / economiaAnual;  // Exemplo: custo médio de R$5000/kWp
-            const eficienciaDetalhes = `
-                Com uma capacidade de ${capacidadeFormatada}, o sistema poderá gerar aproximadamente ${geracaoAnual.toLocaleString('pt-BR')} kWh/ano.
-                Estima-se uma economia anual de ${economiaFormatada}, proporcionando um retorno de investimento (payback) em cerca de ${payback.toFixed(1)} anos.
-            `;
-            document.getElementById('eficiencia-detalhes').innerText = eficienciaDetalhes;
-            document.getElementById('eficiencia-box').classList.remove('hidden');
+            // Definir sazonalidade para os 12 meses
+            const sazonalidade = [1.05, 1.10, 1.00, 0.95, 0.85, 0.90, 0.95, 1.00, 1.15, 1.20, 1.10, 1.00];
+            const geracaoMensal = sazonalidade.map((fator, index) => producaoMensalPorKwp * capacidade * fator);
+            desenharGraficoConsumoGeracao(consumo, geracaoMensal, consumoSimultaneoAnual / 12);
         }
 
         function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal, consumoSimultaneoMensal) {
@@ -358,7 +323,7 @@ ________________________________________________________________________________
                         },
                         {
                             label: 'GERAÇÃO KWh',
-                            data: Array(12).fill(geracaoMensal),
+                            data: geracaoMensal,
                             backgroundColor: 'rgba(46, 204, 113, 0.5)',
                             borderColor: 'rgba(46, 204, 113, 1)',
                             borderWidth: 1
@@ -419,4 +384,3 @@ ________________________________________________________________________________
     </script>
 </body>
 </html>
-
