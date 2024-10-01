@@ -153,22 +153,6 @@ ________________________________________________________________________________
             opacity: 1;
         }
 
-        .summary-box {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .summary-item {
-            width: 23%;
-            text-align: center;
-            background-color: #f0f4f7;
-            padding: 10px;
-            border-radius: 5px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
         .error-message {
             color: red;
             display: none;
@@ -309,7 +293,11 @@ ________________________________________________________________________________
             const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
             document.getElementById('graficoConsumoGeracao').classList.add('show');
 
-            const meses = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+            // Simultaneidade calculada com base no consumo mensal e simultaneidade como referência
+            const simultaneidade = 0.7; // exemplo de 70% de simultaneidade
+            const consumoSimultaneoMensal = Array(12).fill(consumoMensal * simultaneidade);
 
             if (window.consumoGeracaoChart) {
                 window.consumoGeracaoChart.destroy();
@@ -323,16 +311,28 @@ ________________________________________________________________________________
                         {
                             label: 'CONSUMO KWh',
                             data: Array(12).fill(consumoMensal),
-                            backgroundColor: 'rgba(231, 76, 60, 0.5)',
-                            borderColor: 'rgba(231, 76, 60, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)', // Azul
+                            borderColor: 'rgba(54, 162, 235, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'GERAÇÃO KWh',
                             data: geracaoMensal,
-                            backgroundColor: 'rgba(46, 204, 113, 0.5)',
-                            borderColor: 'rgba(46, 204, 113, 1)',
+                            backgroundColor: 'rgba(255, 206, 86, 0.5)', // Amarelo
+                            borderColor: 'rgba(255, 206, 86, 1)',
                             borderWidth: 1
+                        },
+                        {
+                            label: 'CONS. SIMUL. KWh',
+                            data: consumoSimultaneoMensal,
+                            type: 'line',
+                            borderColor: 'rgba(255, 159, 64, 1)', // Laranja
+                            backgroundColor: 'rgba(255, 159, 64, 0.3)',
+                            borderWidth: 2,
+                            fill: false,
+                            pointStyle: 'circle',
+                            pointRadius: 5,
+                            pointBackgroundColor: 'rgba(255, 159, 64, 1)',
                         }
                     ]
                 },
