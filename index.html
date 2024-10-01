@@ -215,7 +215,8 @@ ________________________________________________________________________________
         </div>
         <button onclick="calcular()">Calcular</button>
 
-        <canvas id="graficoEconomiaAnual" width="400" height="200"></canvas>
+        <canvas id="graficoConsumoGeracao" width="400" height="200"></canvas>
+        <canvas id="graficoEconomiaMensal" width="400" height="200"></canvas>
 
         <div class="result-box" id="resultados">
             <div class="result-item">
@@ -255,11 +256,11 @@ ________________________________________________________________________________
             limparMensagensErro();
 
             const irradiacaoDiaria = 4.55;
-            const consumo = converterParaNumero(document.getElementById('consumo').value) || 1633; // Consumo médio mensal em kWh (da imagem)
+            const consumo = converterParaNumero(document.getElementById('consumo').value) || 1633;
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
             const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
             const excedente = parseFloat(document.getElementById('excedente').value) / 100;
-            const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value) || 1.17; // Tarifa (da imagem)
+            const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value) || 1.17;
             const eficiencia = 0.8;
 
             // Impostos e Custos Extras
@@ -299,43 +300,112 @@ ________________________________________________________________________________
             // Tarifa com Impostos
             const tarifaComImpostos = tarifaSemImpostos * (1 + pis + cofins + icms);
 
-            // Economia anual estimada
-            const economiaAnual = (consumo * tarifaComImpostos * 12 * cobertura * (1 + excedente)) - (iluminacaoPublica * 12);
-            const economiaFormatada = "R$ " + economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " / Ano";
+            // Economia mensal estimada e custo sem energia solar
+            const custoMensalSemSolar = consumo * tarifaComImpostos + iluminacaoPublica;
+            const economiaMensalComSolar = consumo * tarifaComImpostos * cobertura * (1 + excedente) - iluminacaoPublica;
 
             // Atualizar resultados na tela
             document.getElementById('capacidade').innerText = capacidadeFormatada;
             document.getElementById('paineis').innerText = `${numeroDePaineis} painéis de 550W`;
             document.getElementById('area').innerText = areaFormatada;
-            document.getElementById('economia').innerText = economiaFormatada;
+            document.getElementById('economia').innerText = `R$ ${(economiaMensalComSolar * 12).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / Ano`;
 
-            // Gráfico de Economia Anual (Apenas 1 Ano)
-            desenharGraficoEconomiaAnual(economiaAnual, consumo * tarifaComImpostos * 12, iluminacaoPublica * 12);
+            // Definir sazonalidade para os 12 meses
+            const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
+            const geracaoMensal = sazonalidade.map(fator => producaoMensalPorKwp * capacidade * fator);
+            desenharGraficoConsumoGeracao(consumo, geracaoMensal);
+
+            // Gerar gráficos mensais de economia
+            const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+            const custoComSolarMensal = meses.map(() => economiaMensalComSolar);
+            const custoSemSolarMensal = meses.map(() => custoMensalSemSolar);
+            desenharGraficoEconomiaMensal(meses, custoSemSolarMensal, custoComSolarMensal);
         }
 
-        function desenharGraficoEconomiaAnual(economiaComSolar, custoSemSolar, iluminacaoPublicaAnual) {
-            const ctx = document.getElementById('graficoEconomiaAnual').getContext('2d');
-            document.getElementById('graficoEconomiaAnual').classList.add('show');
+        function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal) {
+            const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
+            document.getElementById('graficoConsumoGeracao').classList.add('show');
 
-            if (window.economiaAnualChart) {
-                window.economiaAnualChart.destroy();
+            const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+            if (window.consumoGeracaoChart) {
+                window.consumoGeracaoChart.destroy();
             }
 
-            window.economiaAnualChart = new Chart(ctx, {
+            window.consumoGeracaoChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ["Ano 1"],
+                    labels: meses,
+                    datasets: [
+                        {
+                            label: 'CONSUMO KWh',
+                            data: Array(12).fill(consumoMensal),
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'GERAÇÃO KWh',
+                            data: geracaoMensal,
+                            backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Gráfico de Consumo X Geração (Em 12 Meses)'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'kWh/Mês'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Meses'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function desenharGraficoEconomiaMensal(meses, custoSemSolarMensal, custoComSolarMensal) {
+            const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
+            document.getElementById('graficoEconomiaMensal').classList.add('show');
+
+            if (window.economiaMensalChart) {
+                window.economiaMensalChart.destroy();
+            }
+
+            window.economiaMensalChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: meses,
                     datasets: [
                         {
                             label: 'Custo Sem Solar (R$)',
-                            data: [custoSemSolar],
+                            data: custoSemSolarMensal,
                             backgroundColor: 'rgba(231, 76, 60, 0.5)',
                             borderColor: 'rgba(231, 76, 60, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Custo Com Solar (R$)',
-                            data: [economiaComSolar],
+                            data: custoComSolarMensal,
                             backgroundColor: 'rgba(46, 204, 113, 0.5)',
                             borderColor: 'rgba(46, 204, 113, 1)',
                             borderWidth: 1
@@ -350,7 +420,7 @@ ________________________________________________________________________________
                         },
                         title: {
                             display: true,
-                            text: 'Comparação de Custos Anuais Com e Sem Energia Solar (1º Ano)'
+                            text: 'Comparação de Custos Mensais Com e Sem Energia Solar (1º Ano)'
                         }
                     },
                     scales: {
@@ -358,13 +428,13 @@ ________________________________________________________________________________
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Custo Anual (R$)'
+                                text: 'Custo Mensal (R$)'
                             }
                         },
                         x: {
                             title: {
                                 display: true,
-                                text: 'Anos'
+                                text: 'Meses'
                             }
                         }
                     }
