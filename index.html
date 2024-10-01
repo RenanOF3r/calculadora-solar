@@ -93,7 +93,7 @@ ________________________________________________________________________________
         }
 
         .result-box .result-item {
-            width: 23%; /* Ajustado para que caibam quatro painéis em uma linha */
+            width: 23%;
             background-color: #ffffff;
             padding: 20px;
             border-radius: 8px;
@@ -168,6 +168,17 @@ ________________________________________________________________________________
             font-weight: bold;
             color: #2c3e50;
         }
+
+        .error-message {
+            color: red;
+            display: none;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .error-message.show {
+            display: block;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -234,7 +245,6 @@ ________________________________________________________________________________
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         function atualizarValor(id) {
             const valor = document.getElementById(id).value;
@@ -273,35 +283,23 @@ ________________________________________________________________________________
             const diasMes = 30;
             const producaoMensalPorKwp = irradiacaoDiaria * diasMes * eficiencia;
 
-            // Capacidade do sistema em kWp, incluindo o excedente
             const capacidade = (consumo / producaoMensalPorKwp) * (cobertura + excedente);
             const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
 
-            // Quantidade de painéis necessários
-            const capacidadePorPainel = 0.55;  // Cada painel tem 0.55 kWp
+            const capacidadePorPainel = 0.55;
             const numeroDePaineis = Math.ceil(capacidade / capacidadePorPainel);
-            const areaPorPainel = 1.134 * 2.278;  // Área de cada painel em m²
+            const areaPorPainel = 1.134 * 2.278;
             const areaTotal = numeroDePaineis * areaPorPainel;
             const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
 
-            // Economia anual estimada
             const economiaAnual = consumo * tarifa * 12 * cobertura * (1 + excedente);
             const economiaFormatada = "R$ " + economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " / Ano";
 
-            // Atualizar resultados na tela
             document.getElementById('capacidade').innerText = capacidadeFormatada;
             document.getElementById('paineis').innerText = `${numeroDePaineis} painéis de 550W`;
             document.getElementById('area').innerText = areaFormatada;
             document.getElementById('economia').innerText = economiaFormatada;
 
-            // Atualizar resumo anual e gráfico
-            const geracaoAnual = producaoMensalPorKwp * capacidade * 12;
-            document.getElementById('resumo-consumo').innerText = `Consumo: ${(consumo * 12).toLocaleString('pt-BR')} kWh`;
-            document.getElementById('resumo-geracao').innerText = `Geração: ${geracaoAnual.toLocaleString('pt-BR')} kWh`;
-            document.getElementById('resumo-media').innerText = `Geração Média Mensal: ${(geracaoAnual / 12).toLocaleString('pt-BR')} kWh/Mês`;
-            document.getElementById('resumo').classList.remove('hidden');
-
-            // Definir sazonalidade para os 12 meses
             const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
             const geracaoMensal = sazonalidade.map(fator => producaoMensalPorKwp * capacidade * fator);
             desenharGraficoConsumoGeracao(consumo, geracaoMensal);
