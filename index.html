@@ -14,6 +14,7 @@ ________________________________________________________________________________
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,12 +29,14 @@ ________________________________________________________________________________
             line-height: 1.6;
             color: #333;
         }
+
         h1 {
             color: #f39c12;
             text-align: center;
             margin-bottom: 30px;
             font-size: 2rem;
         }
+
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -42,17 +45,23 @@ ________________________________________________________________________________
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
+
         .input-group {
             margin-bottom: 20px;
             position: relative;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
             color: #555;
         }
-        input[type="text"], select, input[type="range"], input[type="number"] {
+
+        input[type="text"],
+        select,
+        input[type="range"],
+        input[type="number"] {
             width: 100%;
             padding: 12px;
             margin-bottom: 5px;
@@ -60,43 +69,32 @@ ________________________________________________________________________________
             border-radius: 5px;
             transition: border-color 0.3s;
         }
-        input[type="text"]:focus, select:focus, input[type="range"]:focus, input[type="number"]:focus {
+
+        input[type="text"]:focus,
+        select:focus,
+        input[type="range"]:focus,
+        input[type="number"]:focus {
             border-color: #3498db;
         }
+
         .slider-value {
             text-align: right;
             font-weight: bold;
             color: #333;
         }
-        .error-message {
-            color: red;
-            font-size: 0.9em;
-            position: absolute;
-            bottom: -20px;
-            left: 0;
-            transition: opacity 0.5s;
-            opacity: 0;
-        }
-        .error-message.show {
-            opacity: 1;
-        }
+
         .result-box {
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             margin-top: 30px;
-            transition: opacity 1s, transform 1s;
-            opacity: 0;
             background-color: #f7f9fc;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             transform: translateY(20px);
         }
-        .result-box.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
+
         .result-box div {
             width: 48%;
             background-color: #ffffff;
@@ -107,24 +105,29 @@ ________________________________________________________________________________
             box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
         }
+
         .result-box div:hover {
             transform: scale(1.05);
         }
+
         .result-box h4 {
             color: #3498db;
             margin-bottom: 10px;
             font-size: 1.2rem;
         }
+
         .result-box p {
             font-size: 1.4rem;
             font-weight: bold;
             color: #2c3e50;
         }
+
         .result-box i {
             font-size: 2rem;
             color: #f39c12;
             margin-bottom: 10px;
         }
+
         button {
             background-color: #3498db;
             color: white;
@@ -137,23 +140,23 @@ ________________________________________________________________________________
             display: block;
             margin: 20px auto;
         }
+
         button:hover {
             background-color: #2980b9;
         }
+
         canvas {
             margin-top: 30px;
             max-width: 100%;
-            opacity: 0;
             transition: opacity 1s;
         }
-        canvas.show {
-            opacity: 1;
-        }
+
         .summary-box {
             display: flex;
             justify-content: space-between;
             margin-top: 20px;
         }
+
         .summary-item {
             width: 23%;
             text-align: center;
@@ -166,6 +169,7 @@ ________________________________________________________________________________
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
     <h1>Calculadora Solar Ajustada</h1>
     <div class="container">
@@ -186,33 +190,44 @@ ________________________________________________________________________________
             <div class="slider-value" id="valor-cobertura">100%</div>
         </div>
         <div class="input-group">
-            <label for="simultaneidade">Simultaneidade do Consumo (%)</label>
-            <input type="range" id="simultaneidade" value="70" max="100" min="0" oninput="atualizarValor('simultaneidade')">
-            <div class="slider-value" id="valor-simultaneidade">70%</div>
-        </div>
-        <div class="input-group">
-            <label for="excedente">Excedente Desejado (%)</label>
-            <input type="number" id="excedente" value="0" min="0" max="100" step="5" onchange="calcular()">
-            <span class="slider-value" id="valor-excedente">Excedente: 0%</span>
-        </div>
-        <div class="input-group">
             <label for="tarifa">Tarifa de Energia (R$/kWh)</label>
             <input type="text" id="tarifa" placeholder="Digite a tarifa de energia (use vírgula para decimais)">
             <span class="error-message" id="erro-tarifa">Por favor, insira um valor válido para a tarifa.</span>
         </div>
         <button onclick="calcular()">Calcular</button>
-        
-        <canvas id="graficoConsumoGeracao" width="400" height="200" class="hidden"></canvas>
 
-        <div class="summary-box" id="resumo" class="hidden">
+        <canvas id="graficoConsumoGeracao" width="400" height="200"></canvas>
+
+        <div class="summary-box" id="resumo">
             <div class="summary-item"><span id="resumo-consumo">Consumo: - kWh</span></div>
             <div class="summary-item"><span id="resumo-geracao">Geração: - kWh</span></div>
             <div class="summary-item"><span id="resumo-simultaneidade">Consumo Simultâneo: - kWh</span></div>
             <div class="summary-item"><span id="resumo-media">Geração Média Mensal: - kWh/Mês</span></div>
         </div>
+        <div class="result-box" id="resultados">
+            <div>
+                <i class="fas fa-solar-panel"></i>
+                <h4>Capacidade (kWp)</h4>
+                <p id="capacidade">-</p>
+            </div>
+            <div>
+                <i class="fas fa-th"></i>
+                <h4>Quantidade de Painéis</h4>
+                <p id="paineis">-</p>
+            </div>
+            <div>
+                <i class="fas fa-ruler-combined"></i>
+                <h4>Área Ocupada</h4>
+                <p id="area">-</p>
+            </div>
+            <div>
+                <i class="fas fa-piggy-bank"></i>
+                <h4>Economia Estimada</h4>
+                <p id="economia">-</p>
+            </div>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         function atualizarValor(id) {
             const valor = document.getElementById(id).value;
@@ -229,8 +244,6 @@ ________________________________________________________________________________
             const irradiacaoDiaria = 4.55;
             const consumo = converterParaNumero(document.getElementById('consumo').value);
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
-            const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
-            const excedente = parseFloat(document.getElementById('excedente').value) / 100;
             const tarifa = converterParaNumero(document.getElementById('tarifa').value);
             const eficiencia = 0.8;
 
@@ -251,8 +264,8 @@ ________________________________________________________________________________
             const diasMes = 30;
             const producaoMensalPorKwp = irradiacaoDiaria * diasMes * eficiencia;
 
-            // Capacidade do sistema em kWp, incluindo o excedente
-            const capacidade = ((consumo / producaoMensalPorKwp) * cobertura) * (1 + excedente);
+            // Capacidade do sistema em kWp
+            const capacidade = (consumo / producaoMensalPorKwp) * cobertura;
             const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
 
             // Quantidade de painéis necessários
@@ -263,7 +276,7 @@ ________________________________________________________________________________
             const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
 
             // Economia anual estimada
-            const economiaAnual = consumo * tarifa * 12 * cobertura * (1 + excedente);
+            const economiaAnual = consumo * tarifa * 12 * cobertura;
             const economiaFormatada = "R$ " + economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " / Ano";
 
             // Atualizar resultados na tela
@@ -275,31 +288,32 @@ ________________________________________________________________________________
             document.getElementById('resultados').classList.add('show');
 
             // Atualizar resumo anual e gráfico
-            const consumoSimultaneoAnual = consumo * 12 * simultaneidade;
             const geracaoAnual = producaoMensalPorKwp * capacidade * 12;
-
             document.getElementById('resumo-consumo').innerText = `Consumo: ${(consumo * 12).toLocaleString('pt-BR')} kWh`;
             document.getElementById('resumo-geracao').innerText = `Geração: ${geracaoAnual.toLocaleString('pt-BR')} kWh`;
-            document.getElementById('resumo-simultaneidade').innerText = `Consumo Simultâneo: ${consumoSimultaneoAnual.toLocaleString('pt-BR')} kWh`;
             document.getElementById('resumo-media').innerText = `Geração Média Mensal: ${(geracaoAnual / 12).toLocaleString('pt-BR')} kWh/Mês`;
             document.getElementById('resumo').classList.remove('hidden');
 
             // Definir sazonalidade para os 12 meses
             const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
             const geracaoMensal = sazonalidade.map(fator => producaoMensalPorKwp * capacidade * fator);
-            desenharGraficoConsumoGeracao(consumo, geracaoMensal, consumoSimultaneoAnual / 12);
+            desenharGraficoConsumoGeracao(consumo, geracaoMensal);
         }
 
-        function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal, consumoSimultaneoMensal) {
+        function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal) {
             const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
             document.getElementById('graficoConsumoGeracao').classList.add('show');
 
-            const meses = [...Array(12).keys()].map(i => i + 1);
+            const meses = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-            new Chart(ctx, {
+            if (window.consumoGeracaoChart) {
+                window.consumoGeracaoChart.destroy();
+            }
+
+            window.consumoGeracaoChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: meses.map(mes => `${mes}`),
+                    labels: meses,
                     datasets: [
                         {
                             label: 'CONSUMO KWh',
@@ -314,17 +328,6 @@ ________________________________________________________________________________
                             backgroundColor: 'rgba(46, 204, 113, 0.5)',
                             borderColor: 'rgba(46, 204, 113, 1)',
                             borderWidth: 1
-                        },
-                        {
-                            label: 'CONS. SIMUL. KWh',
-                            data: Array(12).fill(consumoSimultaneoMensal),
-                            type: 'line',
-                            borderColor: 'rgba(52, 152, 219, 1)',
-                            backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                            fill: false,
-                            borderDash: [5, 5],
-                            pointRadius: 5,
-                            tension: 0.3
                         }
                     ]
                 },
@@ -370,4 +373,5 @@ ________________________________________________________________________________
         }
     </script>
 </body>
+
 </html>
