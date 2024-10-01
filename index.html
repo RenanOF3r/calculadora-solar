@@ -82,9 +82,9 @@ ________________________________________________________________________________
         }
 
         .result-box {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
             margin-top: 30px;
             background-color: #f7f9fc;
             padding: 20px;
@@ -93,11 +93,9 @@ ________________________________________________________________________________
         }
 
         .result-box .result-item {
-            width: 23%;
             background-color: #ffffff;
             padding: 20px;
             border-radius: 8px;
-            margin-bottom: 20px;
             text-align: center;
             box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
@@ -165,14 +163,8 @@ ________________________________________________________________________________
         }
 
         @media (max-width: 768px) {
-            .result-box .result-item {
-                width: 45%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .result-box .result-item {
-                width: 100%;
+            .result-box {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -317,8 +309,8 @@ ________________________________________________________________________________
 
             // Gerar gráficos mensais de economia
             const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-            const custoComSolarMensal = meses.map(() => economiaMensalComSolar);
-            const custoSemSolarMensal = meses.map(() => custoMensalSemSolar);
+            const custoComSolarMensal = meses.map((_, index) => economiaMensalComSolar * sazonalidade[index]);
+            const custoSemSolarMensal = meses.map((_, index) => custoMensalSemSolar * sazonalidade[index]);
             desenharGraficoEconomiaMensal(meses, custoSemSolarMensal, custoComSolarMensal);
         }
 
@@ -357,7 +349,15 @@ ________________________________________________________________________________
                     responsive: true,
                     plugins: {
                         legend: {
-                            position: 'top'
+                            position: 'top',
+                            onClick: (e, legendItem, legend) => {
+                                // Legenda interativa
+                                const index = legendItem.datasetIndex;
+                                const ci = legend.chart;
+                                const meta = ci.getDatasetMeta(index);
+                                meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+                                ci.update();
+                            }
                         },
                         title: {
                             display: true,
@@ -416,7 +416,15 @@ ________________________________________________________________________________
                     responsive: true,
                     plugins: {
                         legend: {
-                            position: 'top'
+                            position: 'top',
+                            onClick: (e, legendItem, legend) => {
+                                // Legenda interativa
+                                const index = legendItem.datasetIndex;
+                                const ci = legend.chart;
+                                const meta = ci.getDatasetMeta(index);
+                                meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+                                ci.update();
+                            }
                         },
                         title: {
                             display: true,
