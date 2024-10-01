@@ -17,7 +17,7 @@ ________________________________________________________________________________
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Solar Ajustada</title>
+    <title>Calculadora Solar</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 20px; }
         h1 { color: #f39c12; text-align: center; }
@@ -33,12 +33,13 @@ ________________________________________________________________________________
         .result-box div { width: 48%; background-color: #f0f4f7; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
         button { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
         button:hover { background-color: #2980b9; }
-        canvas { margin-top: 30px; }
+        canvas { margin-top: 30px; max-width: 100%; }
+        .hidden { display: none; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Calculadora Solar Ajustada</h1>
+    <h1>Calculadora Solar</h1>
     <div class="container">
         <div class="input-group">
             <label for="estado">Estado</label>
@@ -47,7 +48,29 @@ ________________________________________________________________________________
                 <option value="4,55">Acre (AC)</option>
                 <option value="5,60">Alagoas (AL)</option>
                 <option value="4,55">Amapá (AP)</option>
-                <!-- ... outros estados ... -->
+                <option value="4,55">Amazonas (AM)</option>
+                <option value="5,60">Bahia (BA)</option>
+                <option value="5,25">Distrito Federal (DF)</option>
+                <option value="4,55">Espírito Santo (ES)</option>
+                <option value="5,25">Goiás (GO)</option>
+                <option value="5,60">Maranhão (MA)</option>
+                <option value="5,25">Mato Grosso (MT)</option>
+                <option value="5,25">Mato Grosso do Sul (MS)</option>
+                <option value="4,55">Minas Gerais (MG)</option>
+                <option value="5,60">Pará (PA)</option>
+                <option value="5,60">Paraíba (PB)</option>
+                <option value="4,20">Paraná (PR)</option>
+                <option value="5,60">Pernambuco (PE)</option>
+                <option value="5,60">Piauí (PI)</option>
+                <option value="4,55">Rio de Janeiro (RJ)</option>
+                <option value="5,60">Rio Grande do Norte (RN)</option>
+                <option value="4,20">Rio Grande do Sul (RS)</option>
+                <option value="4,55">Rondônia (RO)</option>
+                <option value="4,55">Roraima (RR)</option>
+                <option value="4,20">Santa Catarina (SC)</option>
+                <option value="4,55">São Paulo (SP)</option>
+                <option value="5,60">Sergipe (SE)</option>
+                <option value="4,55">Tocantins (TO)</option>
             </select>
             <span class="error-message" id="erro-estado">Por favor, selecione um estado.</span>
         </div>
@@ -76,12 +99,13 @@ ________________________________________________________________________________
         <div class="result-box" id="resultados">
             <div><h4>Incidência Solar Ajustada</h4><p id="incidencia">Valor Médio (Brasil): 4911,84 kWh/m²/ano</p></div>
             <div><h4>Capacidade (kWp)</h4><p id="capacidade">-</p></div>
-            <div><h4>Quantidade de Painéis</h4><p id="paineis">-</p></div>
             <div><h4>Área ocupada</h4><p id="area">-</p></div>
             <div><h4>Economia estimada</h4><p id="economia">-</p></div>
         </div>
-        
+
         <canvas id="graficoEconomia" width="400" height="200" class="hidden"></canvas>
+        <canvas id="graficoGeracaoMensal" width="400" height="200" class="hidden"></canvas>
+        <canvas id="graficoEmissoes" width="400" height="200" class="hidden"></canvas>
     </div>
 
     <script>
@@ -141,15 +165,11 @@ ________________________________________________________________________________
             const capacidade = ((consumo / producaoMensalPorKwp) * cobertura);
             const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
 
-            // Calculando o número de painéis necessários (painel de 550W = 0.55 kWp)
-            const capacidadePorPainel = 0.55; // kWp
-            const numeroDePaineis = Math.ceil(capacidade / capacidadePorPainel);
-
             // Calculando a área ocupada pelos painéis (em metros quadrados)
             const larguraPainel = 1.134; // metros
             const alturaPainel = 2.278; // metros
             const areaPorPainel = larguraPainel * alturaPainel;
-            const areaTotal = numeroDePaineis * areaPorPainel;
+            const areaTotal = Math.ceil(capacidade / 0.55) * areaPorPainel;
             const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
 
             // Cálculo da economia anual estimada
@@ -158,34 +178,117 @@ ________________________________________________________________________________
 
             // Atualizar resultados na tela
             document.getElementById('capacidade').innerText = capacidadeFormatada;
-            document.getElementById('paineis').innerText = `${numeroDePaineis} painéis de 550W`;
             document.getElementById('area').innerText = areaFormatada;
             document.getElementById('economia').innerText = economiaFormatada;
 
             // Exibir os resultados com animação
             document.getElementById('resultados').classList.add('show');
 
-            // Exibir gráfico da economia ao longo dos anos
-            desenharGraficoEconomia(economia);
+            // Exibir gráficos
+            desenharGraficoEconomia(economia, consumo * tarifa * 12);
+            desenharGraficoGeracaoMensal(producaoMensalPorKwp * capacidade);
+            desenharGraficoEmissoes(economia);
         }
 
-        // Função para desenhar o gráfico da economia usando Chart.js
-        function desenharGraficoEconomia(economiaAnual) {
+        // Função para desenhar o gráfico de economia com e sem sistema solar usando Chart.js
+        function desenharGraficoEconomia(economiaAnual, custoAnualSemSistema) {
             const ctx = document.getElementById('graficoEconomia').getContext('2d');
             document.getElementById('graficoEconomia').classList.remove('hidden');
 
-            const anos = [...Array(10).keys()].map(i => i + 1); // 1 a 10 anos
+            const anos = [...Array(10).keys()].map(i => i + 1);
             const economias = anos.map(ano => economiaAnual * ano);
+            const custosSemSistema = anos.map(ano => custoAnualSemSistema * ano);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: anos.map(ano => `Ano ${ano}`),
+                    datasets: [
+                        {
+                            label: 'Economia Acumulada com Sistema Solar (R$)',
+                            data: economias,
+                            borderColor: 'rgba(52, 152, 219, 1)',
+                            backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                            fill: true
+                        },
+                        {
+                            label: 'Custo Sem Sistema Solar (R$)',
+                            data: custosSemSistema,
+                            borderColor: 'rgba(231, 76, 60, 1)',
+                            backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Comparação de Economia com e Sem Sistema Solar'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Função para desenhar o gráfico de geração estimada para 12 meses com sazonalidade
+        function desenharGraficoGeracaoMensal(geracaoAnual) {
+            const ctx = document.getElementById('graficoGeracaoMensal').getContext('2d');
+            document.getElementById('graficoGeracaoMensal').classList.remove('hidden');
+
+            const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            const sazonalidade = [1.05, 1.10, 1.15, 1.10, 1.05, 1.00, 0.95, 0.90, 0.95, 1.00, 1.05, 1.10];
+            const geracaoMensal = sazonalidade.map(fator => (geracaoAnual / 12) * fator);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: meses,
+                    datasets: [{
+                        label: 'Geração Estimada (kWh)',
+                        data: geracaoMensal,
+                        backgroundColor: 'rgba(46, 204, 113, 0.7)',
+                        borderColor: 'rgba(39, 174, 96, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Geração Estimada de Energia para os 12 Meses (com Sazonalidade)'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Função para desenhar o gráfico de emissões de carbono evitadas
+        function desenharGraficoEmissoes(economiaAnual) {
+            const ctx = document.getElementById('graficoEmissoes').getContext('2d');
+            document.getElementById('graficoEmissoes').classList.remove('hidden');
+
+            const anos = [...Array(10).keys()].map(i => i + 1);
+            const emissaoPorKwh = 0.085; // toneladas de CO2 por kWh economizado (valor aproximado)
+            const emissoesEvitadas = anos.map(ano => economiaAnual * emissaoPorKwh * ano);
 
             new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: anos.map(ano => `Ano ${ano}`),
                     datasets: [{
-                        label: 'Economia Acumulada (R$)',
-                        data: economias,
-                        borderColor: 'rgba(52, 152, 219, 1)',
-                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        label: 'Emissões Evitadas (toneladas de CO2)',
+                        data: emissoesEvitadas,
+                        borderColor: 'rgba(46, 134, 193, 1)',
+                        backgroundColor: 'rgba(93, 173, 226, 0.3)',
                         fill: true
                     }]
                 },
@@ -197,7 +300,7 @@ ________________________________________________________________________________
                         },
                         title: {
                             display: true,
-                            text: 'Economia Acumulada ao Longo do Tempo'
+                            text: 'Emissões de Carbono Evitadas com o Sistema Solar'
                         }
                     }
                 }
@@ -219,4 +322,3 @@ ________________________________________________________________________________
     </script>
 </body>
 </html>
-
