@@ -171,16 +171,9 @@ ________________________________________________________________________________
     <div class="container">
         <div class="input-group">
             <label for="cidade">Cidade</label>
-            <select id="cidade" onchange="atualizarIrradiacao()">
-                <option value="" disabled selected>Selecione sua cidade no RJ</option>
-                <option value="4.75">Rio de Janeiro (Capital)</option>
-                <option value="4.60">Niterói</option>
-                <option value="4.80">Angra dos Reis</option>
-                <option value="4.70">Campos dos Goytacazes</option>
-                <option value="4.55">Petrópolis</option>
-                <!-- Add more cities with placeholder values for irradiation as needed -->
+            <select id="cidade" disabled>
+                <option value="4.55" selected>Rio de Janeiro (RJ)</option>
             </select>
-            <span class="error-message" id="erro-cidade">Por favor, selecione uma cidade.</span>
         </div>
         <div class="input-group">
             <label for="consumo">Consumo médio mensal (kWh)</label>
@@ -233,8 +226,7 @@ ________________________________________________________________________________
         function calcular() {
             limparMensagensErro();
 
-            const cidadeSelect = document.getElementById('cidade');
-            const irradiacaoDiaria = parseFloat(cidadeSelect.value);
+            const irradiacaoDiaria = 4.55;
             const consumo = converterParaNumero(document.getElementById('consumo').value);
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
             const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
@@ -243,11 +235,6 @@ ________________________________________________________________________________
             const eficiencia = 0.8;
 
             let erro = false;
-
-            if (isNaN(irradiacaoDiaria)) {
-                mostrarErro('cidade', 'Por favor, selecione uma cidade.');
-                erro = true;
-            }
 
             if (isNaN(consumo)) {
                 mostrarErro('consumo', 'Por favor, insira um valor válido para o consumo.');
@@ -298,8 +285,8 @@ ________________________________________________________________________________
             document.getElementById('resumo').classList.remove('hidden');
 
             // Definir sazonalidade para os 12 meses
-            const sazonalidade = [1.05, 1.10, 1.00, 0.95, 0.85, 0.90, 0.95, 1.00, 1.15, 1.20, 1.10, 1.00];
-            const geracaoMensal = sazonalidade.map((fator, index) => producaoMensalPorKwp * capacidade * fator);
+            const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
+            const geracaoMensal = sazonalidade.map(fator => producaoMensalPorKwp * capacidade * fator);
             desenharGraficoConsumoGeracao(consumo, geracaoMensal, consumoSimultaneoAnual / 12);
         }
 
