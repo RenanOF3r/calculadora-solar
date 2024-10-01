@@ -93,7 +93,7 @@ ________________________________________________________________________________
         }
 
         .result-box .result-item {
-            width: 48%;
+            width: 23%; /* Ajustado para que caibam quatro painéis em uma linha */
             background-color: #ffffff;
             padding: 20px;
             border-radius: 8px;
@@ -146,6 +146,11 @@ ________________________________________________________________________________
             margin-top: 30px;
             max-width: 100%;
             transition: opacity 1s;
+            opacity: 0;
+        }
+
+        canvas.show {
+            opacity: 1;
         }
 
         .summary-box {
