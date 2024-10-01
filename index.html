@@ -35,6 +35,8 @@ ________________________________________________________________________________
         button:hover { background-color: #2980b9; }
         canvas { margin-top: 30px; max-width: 100%; }
         .hidden { display: none; }
+        .summary-box { display: flex; justify-content: space-between; margin-top: 20px; }
+        .summary-item { width: 23%; text-align: center; background-color: #f0f4f7; padding: 10px; border-radius: 5px; font-weight: bold; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -96,46 +98,32 @@ ________________________________________________________________________________
         </div>
         <button onclick="calcular()">Calcular</button>
         
-        <div class="result-box" id="resultados">
-            <div><h4>Incidência Solar Ajustada</h4><p id="incidencia">Valor Médio (Brasil): 4911,84 kWh/m²/ano</p></div>
-            <div><h4>Capacidade (kWp)</h4><p id="capacidade">-</p></div>
-            <div><h4>Área ocupada</h4><p id="area">-</p></div>
-            <div><h4>Economia estimada</h4><p id="economia">-</p></div>
-        </div>
+        <canvas id="graficoConsumoGeracao" width="400" height="200" class="hidden"></canvas>
 
-        <canvas id="graficoEconomia" width="400" height="200" class="hidden"></canvas>
-        <canvas id="graficoGeracaoMensal" width="400" height="200" class="hidden"></canvas>
-        <canvas id="graficoEmissoes" width="400" height="200" class="hidden"></canvas>
+        <div class="summary-box" id="resumo" class="hidden">
+            <div class="summary-item"><span id="resumo-consumo">Consumo: - kWh</span></div>
+            <div class="summary-item"><span id="resumo-geracao">Geração: - kWh</span></div>
+            <div class="summary-item"><span id="resumo-simultaneidade">Consumo Simultâneo: - kWh</span></div>
+            <div class="summary-item"><span id="resumo-media">Geração Média Mensal: - kWh/Mês</span></div>
+        </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Função para atualizar a incidência solar selecionada
-        function atualizarIrradiacao() {
-            const estadoSelect = document.getElementById('estado');
-            const incidencia = estadoSelect.value.replace(",", ".");
-            document.getElementById('incidencia').innerText = `Valor Selecionado: ${incidencia.replace(".", ",")} kWh/m²/dia`;
-        }
-
-        // Função para atualizar o valor dos sliders de cobertura e simultaneidade
-        function atualizarValor(id) {
-            const valor = document.getElementById(id).value;
-            document.getElementById(`valor-${id}`).innerText = `${valor}%`;
-        }
-
         // Função para converter valores de vírgula para ponto
         function converterParaNumero(valor) {
             return parseFloat(valor.replace(",", "."));
         }
 
-        // Função para calcular a capacidade necessária do sistema solar
+        // Função para calcular a capacidade e atualizar os resultados
         function calcular() {
             limparMensagensErro();
 
             const consumo = converterParaNumero(document.getElementById('consumo').value);
             const incidenciaDiaria = converterParaNumero(document.getElementById('estado').value);
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
-            const tarifa = converterParaNumero(document.getElementById('tarifa').value);
-            const eficiencia = 0.8;  // Considerando 80% de eficiência do sistema
+            const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
+            const eficiencia = 0.8;
 
             let erro = false;
 
@@ -149,74 +137,67 @@ ________________________________________________________________________________
                 erro = true;
             }
 
-            if (isNaN(tarifa)) {
-                mostrarErro('tarifa', 'Por favor, insira um valor válido para a tarifa.');
-                erro = true;
-            }
-
             if (erro) return;
 
             const diasMes = 30;
-
-            // Produção mensal por kWp considerando eficiência
             const producaoMensalPorKwp = incidenciaDiaria * diasMes * eficiencia;
+            const capacidade = consumo / producaoMensalPorKwp * cobertura;
 
-            // Cálculo da capacidade do sistema em kWp
-            const capacidade = ((consumo / producaoMensalPorKwp) * cobertura);
-            const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
+            const geracaoMensal = producaoMensalPorKwp * capacidade;
+            const consumoSimultaneo = consumo * simultaneidade;
 
-            // Calculando a área ocupada pelos painéis (em metros quadrados)
-            const larguraPainel = 1.134; // metros
-            const alturaPainel = 2.278; // metros
-            const areaPorPainel = larguraPainel * alturaPainel;
-            const areaTotal = Math.ceil(capacidade / 0.55) * areaPorPainel;
-            const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
+            // Desenhar gráfico de consumo vs geração
+            desenharGraficoConsumoGeracao(consumo, geracaoMensal, consumoSimultaneo);
 
-            // Cálculo da economia anual estimada
-            const economia = (consumo * tarifa * 12);
-            const economiaFormatada = "R$ " + economia.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " / Ano";
-
-            // Atualizar resultados na tela
-            document.getElementById('capacidade').innerText = capacidadeFormatada;
-            document.getElementById('area').innerText = areaFormatada;
-            document.getElementById('economia').innerText = economiaFormatada;
-
-            // Exibir os resultados com animação
-            document.getElementById('resultados').classList.add('show');
-
-            // Exibir gráficos
-            desenharGraficoEconomia(economia, consumo * tarifa * 12);
-            desenharGraficoGeracaoMensal(producaoMensalPorKwp * capacidade);
-            desenharGraficoEmissoes(economia);
+            // Atualizar resumo anual
+            const consumoAnual = consumo * 12;
+            const geracaoAnual = geracaoMensal * 12;
+            document.getElementById('resumo-consumo').innerText = `Consumo: ${consumoAnual.toLocaleString('pt-BR')} kWh`;
+            document.getElementById('resumo-geracao').innerText = `Geração: ${geracaoAnual.toLocaleString('pt-BR')} kWh`;
+            document.getElementById('resumo-simultaneidade').innerText = `Consumo Simultâneo: ${(consumoSimultaneo * 12).toLocaleString('pt-BR')} kWh`;
+            document.getElementById('resumo-media').innerText = `Geração Média Mensal: ${geracaoMensal.toLocaleString('pt-BR')} kWh/Mês`;
+            document.getElementById('resumo').classList.remove('hidden');
         }
 
-        // Função para desenhar o gráfico de economia com e sem sistema solar usando Chart.js
-        function desenharGraficoEconomia(economiaAnual, custoAnualSemSistema) {
-            const ctx = document.getElementById('graficoEconomia').getContext('2d');
-            document.getElementById('graficoEconomia').classList.remove('hidden');
+        // Função para desenhar o gráfico de consumo vs geração
+        function desenharGraficoConsumoGeracao(consumo, geracaoMensal, consumoSimultaneo) {
+            const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
+            document.getElementById('graficoConsumoGeracao').classList.remove('hidden');
 
-            const anos = [...Array(10).keys()].map(i => i + 1);
-            const economias = anos.map(ano => economiaAnual * ano);
-            const custosSemSistema = anos.map(ano => custoAnualSemSistema * ano);
+            const meses = [...Array(12).keys()].map(i => i + 1);
+            const consumoMensal = Array(12).fill(consumo);
+            const geracaoMensalArr = Array(12).fill(geracaoMensal);
+            const consumoSimultaneoArr = Array(12).fill(consumoSimultaneo);
 
             new Chart(ctx, {
-                type: 'line',
+                type: 'bar',
                 data: {
-                    labels: anos.map(ano => `Ano ${ano}`),
+                    labels: meses.map(mes => `${mes}`),
                     datasets: [
                         {
-                            label: 'Economia Acumulada com Sistema Solar (R$)',
-                            data: economias,
-                            borderColor: 'rgba(52, 152, 219, 1)',
-                            backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                            fill: true
+                            label: 'CONSUMO KWh',
+                            data: consumoMensal,
+                            backgroundColor: 'rgba(231, 76, 60, 0.5)',
+                            borderColor: 'rgba(231, 76, 60, 1)',
+                            borderWidth: 1
                         },
                         {
-                            label: 'Custo Sem Sistema Solar (R$)',
-                            data: custosSemSistema,
-                            borderColor: 'rgba(231, 76, 60, 1)',
-                            backgroundColor: 'rgba(231, 76, 60, 0.2)',
-                            fill: true
+                            label: 'GERAÇÃO KWh',
+                            data: geracaoMensalArr,
+                            backgroundColor: 'rgba(46, 204, 113, 0.5)',
+                            borderColor: 'rgba(46, 204, 113, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'CONS. SIMUL. KWh',
+                            data: consumoSimultaneoArr,
+                            type: 'line',
+                            borderColor: 'rgba(52, 152, 219, 1)',
+                            backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                            fill: false,
+                            borderDash: [5, 5],
+                            pointRadius: 5,
+                            tension: 0.3
                         }
                     ]
                 },
@@ -228,79 +209,22 @@ ________________________________________________________________________________
                         },
                         title: {
                             display: true,
-                            text: 'Comparação de Economia com e Sem Sistema Solar'
+                            text: 'Gráfico de Consumo X Geração (Em 12 Meses)'
                         }
-                    }
-                }
-            });
-        }
-
-        // Função para desenhar o gráfico de geração estimada para 12 meses com sazonalidade
-        function desenharGraficoGeracaoMensal(geracaoAnual) {
-            const ctx = document.getElementById('graficoGeracaoMensal').getContext('2d');
-            document.getElementById('graficoGeracaoMensal').classList.remove('hidden');
-
-            const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-            const sazonalidade = [1.05, 1.10, 1.15, 1.10, 1.05, 1.00, 0.95, 0.90, 0.95, 1.00, 1.05, 1.10];
-            const geracaoMensal = sazonalidade.map(fator => (geracaoAnual / 12) * fator);
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: meses,
-                    datasets: [{
-                        label: 'Geração Estimada (kWh)',
-                        data: geracaoMensal,
-                        backgroundColor: 'rgba(46, 204, 113, 0.7)',
-                        borderColor: 'rgba(39, 174, 96, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'kWh/Mês'
+                            }
                         },
-                        title: {
-                            display: true,
-                            text: 'Geração Estimada de Energia para os 12 Meses (com Sazonalidade)'
-                        }
-                    }
-                }
-            });
-        }
-
-        // Função para desenhar o gráfico de emissões de carbono evitadas
-        function desenharGraficoEmissoes(economiaAnual) {
-            const ctx = document.getElementById('graficoEmissoes').getContext('2d');
-            document.getElementById('graficoEmissoes').classList.remove('hidden');
-
-            const anos = [...Array(10).keys()].map(i => i + 1);
-            const emissaoPorKwh = 0.085; // toneladas de CO2 por kWh economizado (valor aproximado)
-            const emissoesEvitadas = anos.map(ano => economiaAnual * emissaoPorKwh * ano);
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: anos.map(ano => `Ano ${ano}`),
-                    datasets: [{
-                        label: 'Emissões Evitadas (toneladas de CO2)',
-                        data: emissoesEvitadas,
-                        borderColor: 'rgba(46, 134, 193, 1)',
-                        backgroundColor: 'rgba(93, 173, 226, 0.3)',
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Emissões de Carbono Evitadas com o Sistema Solar'
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Meses'
+                            }
                         }
                     }
                 }
