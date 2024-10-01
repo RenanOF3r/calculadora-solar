@@ -60,8 +60,7 @@ ________________________________________________________________________________
 
         input[type="text"],
         select,
-        input[type="range"],
-        input[type="number"] {
+        input[type="range"] {
             width: 100%;
             padding: 12px;
             margin-bottom: 5px;
@@ -72,8 +71,7 @@ ________________________________________________________________________________
 
         input[type="text"]:focus,
         select:focus,
-        input[type="range"]:focus,
-        input[type="number"]:focus {
+        input[type="range"]:focus {
             border-color: #3498db;
         }
 
@@ -92,10 +90,9 @@ ________________________________________________________________________________
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            transform: translateY(20px);
         }
 
-        .result-box div {
+        .result-box .result-item {
             width: 48%;
             background-color: #ffffff;
             padding: 20px;
@@ -106,7 +103,7 @@ ________________________________________________________________________________
             transition: transform 0.3s;
         }
 
-        .result-box div:hover {
+        .result-box .result-item:hover {
             transform: scale(1.05);
         }
 
@@ -190,8 +187,13 @@ ________________________________________________________________________________
             <div class="slider-value" id="valor-cobertura">100%</div>
         </div>
         <div class="input-group">
+            <label for="simultaneidade">Simultaneidade do Consumo (%)</label>
+            <input type="range" id="simultaneidade" value="70" max="100" min="0" oninput="atualizarValor('simultaneidade')">
+            <div class="slider-value" id="valor-simultaneidade">70%</div>
+        </div>
+        <div class="input-group">
             <label for="excedente">Excedente Desejado (%)</label>
-            <input type="number" id="excedente" value="0" min="0" max="100" step="5" onchange="atualizarValor('excedente'); calcular()">
+            <input type="range" id="excedente" value="0" max="100" min="0" step="5" oninput="atualizarValor('excedente')">
             <div class="slider-value" id="valor-excedente">Excedente: 0%</div>
         </div>
         <div class="input-group">
@@ -203,29 +205,23 @@ ________________________________________________________________________________
 
         <canvas id="graficoConsumoGeracao" width="400" height="200"></canvas>
 
-        <div class="summary-box" id="resumo">
-            <div class="summary-item"><span id="resumo-consumo">Consumo: - kWh</span></div>
-            <div class="summary-item"><span id="resumo-geracao">Geração: - kWh</span></div>
-            <div class="summary-item"><span id="resumo-simultaneidade">Consumo Simultâneo: - kWh</span></div>
-            <div class="summary-item"><span id="resumo-media">Geração Média Mensal: - kWh/Mês</span></div>
-        </div>
         <div class="result-box" id="resultados">
-            <div>
+            <div class="result-item">
                 <i class="fas fa-solar-panel"></i>
                 <h4>Capacidade (kWp)</h4>
                 <p id="capacidade">-</p>
             </div>
-            <div>
+            <div class="result-item">
                 <i class="fas fa-th"></i>
                 <h4>Quantidade de Painéis</h4>
                 <p id="paineis">-</p>
             </div>
-            <div>
+            <div class="result-item">
                 <i class="fas fa-ruler-combined"></i>
                 <h4>Área Ocupada</h4>
                 <p id="area">-</p>
             </div>
-            <div>
+            <div class="result-item">
                 <i class="fas fa-piggy-bank"></i>
                 <h4>Economia Estimada</h4>
                 <p id="economia">-</p>
@@ -233,6 +229,7 @@ ________________________________________________________________________________
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         function atualizarValor(id) {
             const valor = document.getElementById(id).value;
@@ -249,6 +246,7 @@ ________________________________________________________________________________
             const irradiacaoDiaria = 4.55;
             const consumo = converterParaNumero(document.getElementById('consumo').value);
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
+            const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
             const excedente = parseFloat(document.getElementById('excedente').value) / 100;
             const tarifa = converterParaNumero(document.getElementById('tarifa').value);
             const eficiencia = 0.8;
@@ -379,4 +377,3 @@ ________________________________________________________________________________
 </body>
 
 </html>
-
