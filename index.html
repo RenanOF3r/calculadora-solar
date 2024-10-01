@@ -238,9 +238,92 @@ ________________________________________________________________________________
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Código JavaScript mantido como na versão anterior,
-        // com melhorias visuais e a integração da cidade selecionada e dados de irradiação.
-        // Também adicionarei a lógica de animação suave no carregamento dos gráficos.
+        function atualizarValor(id) {
+            const valor = document.getElementById(id).value;
+            document.getElementById(`valor-${id}`).innerText = `${valor}%`;
+        }
+
+        function converterParaNumero(valor) {
+            return parseFloat(valor.replace(",", "."));
+        }
+
+        function calcular() {
+            limparMensagensErro();
+
+            const cidadeSelect = document.getElementById('cidade');
+            const irradiacaoDiaria = parseFloat(cidadeSelect.value);
+            const consumo = converterParaNumero(document.getElementById('consumo').value);
+            const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
+            const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
+            const tarifa = converterParaNumero(document.getElementById('tarifa').value);
+            const eficiencia = 0.8;
+
+            let erro = false;
+
+            if (isNaN(irradiacaoDiaria)) {
+                mostrarErro('cidade', 'Por favor, selecione uma cidade.');
+                erro = true;
+            }
+
+            if (isNaN(consumo)) {
+                mostrarErro('consumo', 'Por favor, insira um valor válido para o consumo.');
+                erro = true;
+            }
+
+            if (isNaN(tarifa)) {
+                mostrarErro('tarifa', 'Por favor, insira um valor válido para a tarifa.');
+                erro = true;
+            }
+
+            if (erro) return;
+
+            const diasMes = 30;
+            const producaoMensalPorKwp = irradiacaoDiaria * diasMes * eficiencia;
+
+            // Capacidade do sistema em kWp
+            const capacidade = (consumo / producaoMensalPorKwp) * cobertura;
+            const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
+
+            // Quantidade de painéis necessários
+            const capacidadePorPainel = 0.55;  // Cada painel tem 0.55 kWp
+            const numeroDePaineis = Math.ceil(capacidade / capacidadePorPainel);
+            const areaPorPainel = 1.134 * 2.278;  // Área de cada painel em m²
+            const areaTotal = numeroDePaineis * areaPorPainel;
+            const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
+
+            // Economia anual estimada
+            const economiaAnual = consumo * tarifa * 12 * cobertura;
+            const economiaFormatada = "R$ " + economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " / Ano";
+
+            // Atualizar resultados na tela
+            document.getElementById('capacidade').innerText = capacidadeFormatada;
+            document.getElementById('paineis').innerText = `${numeroDePaineis} painéis de 550W`;
+            document.getElementById('area').innerText = areaFormatada;
+            document.getElementById('economia').innerText = economiaFormatada;
+
+            document.getElementById('resultados').classList.add('show');
+
+            // Atualizar resumo anual
+            const consumoSimultaneoAnual = consumo * 12 * simultaneidade;
+            const geracaoAnual = producaoMensalPorKwp * capacidade * 12;
+
+            document.getElementById('resumo-consumo').innerText = `Consumo: ${(consumo * 12).toLocaleString('pt-BR')} kWh`;
+            document.getElementById('resumo-geracao').innerText = `Geração: ${geracaoAnual.toLocaleString('pt-BR')} kWh`;
+            document.getElementById('resumo-simultaneidade').innerText = `Consumo Simultâneo: ${consumoSimultaneoAnual.toLocaleString('pt-BR')} kWh`;
+            document.getElementById('resumo-media').innerText = `Geração Média Mensal: ${(geracaoAnual / 12).toLocaleString('pt-BR')} kWh/Mês`;
+            document.getElementById('resumo').classList.remove('hidden');
+        }
+
+        function mostrarErro(id, mensagem) {
+            const erroElemento = document.getElementById(`erro-${id}`);
+            erroElemento.innerText = mensagem;
+            erroElemento.classList.add('show');
+        }
+
+        function limparMensagensErro() {
+            const mensagensErro = document.querySelectorAll('.error-message');
+            mensagensErro.forEach(mensagem => mensagem.classList.remove('show'));
+        }
     </script>
 </body>
 </html>
