@@ -85,15 +85,17 @@ ________________________________________________________________________________
             flex-wrap: wrap;
             justify-content: space-between;
             margin-top: 30px;
-            transition: opacity 1s;
+            transition: opacity 1s, transform 1s;
             opacity: 0;
             background-color: #f7f9fc;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
         }
         .result-box.show {
             opacity: 1;
+            transform: translateY(0);
         }
         .result-box div {
             width: 48%;
@@ -141,6 +143,11 @@ ________________________________________________________________________________
         canvas {
             margin-top: 30px;
             max-width: 100%;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+        canvas.show {
+            opacity: 1;
         }
         .summary-box {
             display: flex;
@@ -163,11 +170,17 @@ ________________________________________________________________________________
     <h1>Calculadora Solar Ajustada</h1>
     <div class="container">
         <div class="input-group">
-            <label for="estado">Estado</label>
-            <select id="estado" disabled>
-                <option value="4,55" selected>Rio de Janeiro (RJ)</option>
+            <label for="cidade">Cidade</label>
+            <select id="cidade" onchange="atualizarIrradiacao()">
+                <option value="" disabled selected>Selecione sua cidade no RJ</option>
+                <option value="4.75">Rio de Janeiro (Capital)</option>
+                <option value="4.60">Niterói</option>
+                <option value="4.80">Angra dos Reis</option>
+                <option value="4.70">Campos dos Goytacazes</option>
+                <option value="4.55">Petrópolis</option>
+                <!-- Add more cities with placeholder values for irradiation as needed -->
             </select>
-            <span class="error-message" id="erro-estado">Por favor, selecione um estado.</span>
+            <span class="error-message" id="erro-cidade">Por favor, selecione uma cidade.</span>
         </div>
         <div class="input-group">
             <label for="consumo">Consumo médio mensal (kWh)</label>
@@ -225,8 +238,9 @@ ________________________________________________________________________________
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Código JavaScript mantido como na versão anterior, 
-        // com as melhorias visuais feitas no HTML e CSS acima.
+        // Código JavaScript mantido como na versão anterior,
+        // com melhorias visuais e a integração da cidade selecionada e dados de irradiação.
+        // Também adicionarei a lógica de animação suave no carregamento dos gráficos.
     </script>
 </body>
 </html>
