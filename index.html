@@ -14,62 +14,175 @@ ________________________________________________________________________________
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora Solar Ajustada</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 20px; }
-        h1 { color: #f39c12; text-align: center; }
-        .container { max-width: 900px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], select, input[type="range"] { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        .slider-value { text-align: right; font-weight: bold; }
-        .result-box { display: flex; flex-wrap: wrap; justify-content: space-between; margin-top: 20px; }
-        .result-box div { width: 48%; background-color: #f0f4f7; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
-        button { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-        .hidden { display: none; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        h1 {
+            color: #f39c12;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        select,
+        input[type="range"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        select:focus,
+        input[type="range"]:focus,
+        input[type="number"]:focus {
+            border-color: #3498db;
+        }
+
+        .slider-value {
+            text-align: right;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .result-box {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 30px;
+            background-color: #f7f9fc;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+        }
+
+        .result-box div {
+            width: 48%;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .result-box div:hover {
+            transform: scale(1.05);
+        }
+
+        .result-box h4 {
+            color: #3498db;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .result-box p {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .result-box i {
+            font-size: 2rem;
+            color: #f39c12;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            display: block;
+            margin: 20px auto;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        canvas {
+            margin-top: 30px;
+            max-width: 100%;
+            transition: opacity 1s;
+        }
+
+        .summary-box {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            width: 23%;
+            text-align: center;
+            background-color: #f0f4f7;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
     <h1>Calculadora Solar Ajustada</h1>
     <div class="container">
         <div class="input-group">
-            <label for="estado">Estado</label>
-            <select id="estado" onchange="atualizarIrradiacao()">
-                <option value="" disabled selected>Selecione seu estado</option>
-                <option value="4,55">Acre (AC)</option>
-                <option value="5,60">Alagoas (AL)</option>
-                <option value="4,55">Amapá (AP)</option>
-                <option value="4,55">Amazonas (AM)</option>
-                <option value="5,60">Bahia (BA)</option>
-                <option value="5,25">Distrito Federal (DF)</option>
-                <option value="4,55">Espírito Santo (ES)</option>
-                <option value="5,25">Goiás (GO)</option>
-                <option value="5,60">Maranhão (MA)</option>
-                <option value="5,25">Mato Grosso (MT)</option>
-                <option value="5,25">Mato Grosso do Sul (MS)</option>
-                <option value="4,55">Minas Gerais (MG)</option>
-                <option value="5,60">Pará (PA)</option>
-                <option value="5,60">Paraíba (PB)</option>
-                <option value="4,20">Paraná (PR)</option>
-                <option value="5,60">Pernambuco (PE)</option>
-                <option value="5,60">Piauí (PI)</option>
-                <option value="4,55">Rio de Janeiro (RJ)</option>
-                <option value="5,60">Rio Grande do Norte (RN)</option>
-                <option value="4,20">Rio Grande do Sul (RS)</option>
-                <option value="4,55">Rondônia (RO)</option>
-                <option value="4,55">Roraima (RR)</option>
-                <option value="4,20">Santa Catarina (SC)</option>
-                <option value="4,55">São Paulo (SP)</option>
-                <option value="5,60">Sergipe (SE)</option>
-                <option value="4,55">Tocantins (TO)</option>
+            <label for="cidade">Cidade</label>
+            <select id="cidade" disabled>
+                <option value="4.55" selected>Rio de Janeiro (RJ)</option>
             </select>
         </div>
         <div class="input-group">
             <label for="consumo">Consumo médio mensal (kWh)</label>
             <input type="text" id="consumo" placeholder="Digite seu consumo mensal (use vírgula para decimais)">
+            <span class="error-message" id="erro-consumo">Por favor, insira um valor válido para o consumo.</span>
         </div>
         <div class="input-group">
             <label for="cobertura">Cobertura desejada (%)</label>
@@ -77,91 +190,193 @@ ________________________________________________________________________________
             <div class="slider-value" id="valor-cobertura">100%</div>
         </div>
         <div class="input-group">
-            <label for="simultaneidade">Simultaneidade do Consumo (%)</label>
-            <input type="range" id="simultaneidade" value="70" max="100" min="0" oninput="atualizarValor('simultaneidade')">
-            <div class="slider-value" id="valor-simultaneidade">70%</div>
-        </div>
-        <div class="input-group">
-            <label for="excedente">Excedente (%)</label>
-            <input type="range" id="excedente" value="20" max="100" min="0" oninput="atualizarValor('excedente')">
-            <div class="slider-value" id="valor-excedente">20%</div>
+            <label for="excedente">Excedente Desejado (%)</label>
+            <input type="number" id="excedente" value="0" min="0" max="100" step="5" onchange="atualizarValor('excedente'); calcular()">
+            <div class="slider-value" id="valor-excedente">Excedente: 0%</div>
         </div>
         <div class="input-group">
             <label for="tarifa">Tarifa de Energia (R$/kWh)</label>
             <input type="text" id="tarifa" placeholder="Digite a tarifa de energia (use vírgula para decimais)">
+            <span class="error-message" id="erro-tarifa">Por favor, insira um valor válido para a tarifa.</span>
         </div>
         <button onclick="calcular()">Calcular</button>
-        
-        <div class="result-box">
-            <div><h4>Incidência Solar Ajustada</h4><p id="incidencia">Valor Médio (Brasil): 4911,84 kWh/m²/ano</p></div>
-            <div><h4>Capacidade (kWp)</h4><p id="capacidade">-</p></div>
-            <div class="hidden"><h4>Quantidade de Painéis</h4><p id="paineis">-</p></div>
-            <div><h4>Área ocupada</h4><p id="area">-</p></div>
-            <div><h4>Economia estimada</h4><p id="economia">-</p></div>
+
+        <canvas id="graficoConsumoGeracao" width="400" height="200"></canvas>
+
+        <div class="summary-box" id="resumo">
+            <div class="summary-item"><span id="resumo-consumo">Consumo: - kWh</span></div>
+            <div class="summary-item"><span id="resumo-geracao">Geração: - kWh</span></div>
+            <div class="summary-item"><span id="resumo-simultaneidade">Consumo Simultâneo: - kWh</span></div>
+            <div class="summary-item"><span id="resumo-media">Geração Média Mensal: - kWh/Mês</span></div>
+        </div>
+        <div class="result-box" id="resultados">
+            <div>
+                <i class="fas fa-solar-panel"></i>
+                <h4>Capacidade (kWp)</h4>
+                <p id="capacidade">-</p>
+            </div>
+            <div>
+                <i class="fas fa-th"></i>
+                <h4>Quantidade de Painéis</h4>
+                <p id="paineis">-</p>
+            </div>
+            <div>
+                <i class="fas fa-ruler-combined"></i>
+                <h4>Área Ocupada</h4>
+                <p id="area">-</p>
+            </div>
+            <div>
+                <i class="fas fa-piggy-bank"></i>
+                <h4>Economia Estimada</h4>
+                <p id="economia">-</p>
+            </div>
         </div>
     </div>
 
     <script>
-        // Função para atualizar a incidência solar selecionada
-        function atualizarIrradiacao() {
-            const estadoSelect = document.getElementById('estado');
-            const incidencia = estadoSelect.value.replace(",", ".");
-            document.getElementById('incidencia').innerText = `Valor Selecionado: ${incidencia.replace(".", ",")} kWh/m²/dia`;
-        }
-
-        // Função para atualizar o valor dos sliders de cobertura, simultaneidade e excedente
         function atualizarValor(id) {
             const valor = document.getElementById(id).value;
             document.getElementById(`valor-${id}`).innerText = `${valor}%`;
         }
 
-        // Função para converter valores de vírgula para ponto
         function converterParaNumero(valor) {
             return parseFloat(valor.replace(",", "."));
         }
 
-        // Função para calcular a capacidade necessária do sistema solar
         function calcular() {
+            limparMensagensErro();
+
+            const irradiacaoDiaria = 4.55;
             const consumo = converterParaNumero(document.getElementById('consumo').value);
-            const incidenciaDiaria = converterParaNumero(document.getElementById('estado').value);
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
-            const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
             const excedente = parseFloat(document.getElementById('excedente').value) / 100;
             const tarifa = converterParaNumero(document.getElementById('tarifa').value);
-            const eficiencia = 0.8;  // Considerando 80% de eficiência do sistema
+            const eficiencia = 0.8;
 
-            if (isNaN(incidenciaDiaria) || isNaN(consumo) || isNaN(tarifa)) {
-                alert("Por favor, preencha todos os campos corretamente.");
-                return;
+            let erro = false;
+
+            if (isNaN(consumo)) {
+                mostrarErro('consumo', 'Por favor, insira um valor válido para o consumo.');
+                erro = true;
             }
 
+            if (isNaN(tarifa)) {
+                mostrarErro('tarifa', 'Por favor, insira um valor válido para a tarifa.');
+                erro = true;
+            }
+
+            if (erro) return;
+
             const diasMes = 30;
+            const producaoMensalPorKwp = irradiacaoDiaria * diasMes * eficiencia;
 
-            // Produção mensal por kWp considerando eficiência
-            const producaoMensalPorKwp = incidenciaDiaria * diasMes * eficiencia;
+            // Capacidade do sistema em kWp, incluindo o excedente
+            const capacidade = (consumo / producaoMensalPorKwp) * (cobertura + excedente);
+            const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
 
-            // Cálculo da capacidade do sistema em kWp necessária para cobrir o consumo
-            const capacidadeNecessaria = ((consumo / producaoMensalPorKwp) * cobertura).toFixed(2).replace(".", ",");
+            // Quantidade de painéis necessários
+            const capacidadePorPainel = 0.55;  // Cada painel tem 0.55 kWp
+            const numeroDePaineis = Math.ceil(capacidade / capacidadePorPainel);
+            const areaPorPainel = 1.134 * 2.278;  // Área de cada painel em m²
+            const areaTotal = numeroDePaineis * areaPorPainel;
+            const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
 
-            // Dados do painel
-            const potenciaPainel = 0.475; // kWp (475W)
-            const numeroDePaineis = Math.ceil((consumo / (producaoMensalPorKwp * cobertura)) * (1 - simultaneidade + excedente));
-
-            // Dimensões do painel em metros
-            const larguraPainel = 1.134; // metros
-            const alturaPainel = 1.903; // metros
-            const areaPorPainel = larguraPainel * alturaPainel; // Área por painel em m²
-            const areaTotal = (numeroDePaineis * areaPorPainel).toFixed(2).replace(".", ","); // Área total ocupada em m²
-
-            // Cálculo da economia anual estimada considerando excedente e simultaneidade
-            const economiaAnual = (consumo * tarifa * cobertura * 12 * (1 - excedente)).toFixed(2).replace(".", ",");
+            // Economia anual estimada
+            const economiaAnual = consumo * tarifa * 12 * cobertura * (1 + excedente);
+            const economiaFormatada = "R$ " + economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " / Ano";
 
             // Atualizar resultados na tela
-            document.getElementById('capacidade').innerText = `${capacidadeNecessaria} kWp`;
-            document.getElementById('paineis').innerText = `${numeroDePaineis} painéis de 475W`;
-            document.getElementById('area').innerText = `${areaTotal} m²`;
-            document.getElementById('economia').innerText = `R$ ${economiaAnual} / Ano`;
+            document.getElementById('capacidade').innerText = capacidadeFormatada;
+            document.getElementById('paineis').innerText = `${numeroDePaineis} painéis de 550W`;
+            document.getElementById('area').innerText = areaFormatada;
+            document.getElementById('economia').innerText = economiaFormatada;
+
+            // Atualizar resumo anual e gráfico
+            const geracaoAnual = producaoMensalPorKwp * capacidade * 12;
+            document.getElementById('resumo-consumo').innerText = `Consumo: ${(consumo * 12).toLocaleString('pt-BR')} kWh`;
+            document.getElementById('resumo-geracao').innerText = `Geração: ${geracaoAnual.toLocaleString('pt-BR')} kWh`;
+            document.getElementById('resumo-media').innerText = `Geração Média Mensal: ${(geracaoAnual / 12).toLocaleString('pt-BR')} kWh/Mês`;
+            document.getElementById('resumo').classList.remove('hidden');
+
+            // Definir sazonalidade para os 12 meses
+            const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
+            const geracaoMensal = sazonalidade.map(fator => producaoMensalPorKwp * capacidade * fator);
+            desenharGraficoConsumoGeracao(consumo, geracaoMensal);
+        }
+
+        function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal) {
+            const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
+            document.getElementById('graficoConsumoGeracao').classList.add('show');
+
+            const meses = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+            if (window.consumoGeracaoChart) {
+                window.consumoGeracaoChart.destroy();
+            }
+
+            window.consumoGeracaoChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: meses,
+                    datasets: [
+                        {
+                            label: 'CONSUMO KWh',
+                            data: Array(12).fill(consumoMensal),
+                            backgroundColor: 'rgba(231, 76, 60, 0.5)',
+                            borderColor: 'rgba(231, 76, 60, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'GERAÇÃO KWh',
+                            data: geracaoMensal,
+                            backgroundColor: 'rgba(46, 204, 113, 0.5)',
+                            borderColor: 'rgba(46, 204, 113, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Gráfico de Consumo X Geração (Em 12 Meses)'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'kWh/Mês'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Meses'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function mostrarErro(id, mensagem) {
+            const erroElemento = document.getElementById(`erro-${id}`);
+            erroElemento.innerText = mensagem;
+            erroElemento.classList.add('show');
+        }
+
+        function limparMensagensErro() {
+            const mensagensErro = document.querySelectorAll('.error-message');
+            mensagensErro.forEach(mensagem => mensagem.classList.remove('show'));
         }
     </script>
 </body>
+
 </html>
+
