@@ -310,7 +310,7 @@ ________________________________________________________________________________
                 if (consumoNaoCoberto > 0) {
                     custoComSolarMensal = consumoNaoCoberto * tarifaComImpostos + iluminacaoPublica;
                 } else {
-                    custoComSolarMensal = iluminacaoPublica; // Sem consumo adicional, paga apenas iluminação pública
+                    custoComSolarMensal = 100 * tarifaComImpostos + iluminacaoPublica; // Consumo mínimo é 100 kWh/mês + iluminação pública
                 }
             }
 
@@ -428,6 +428,7 @@ ________________________________________________________________________________
                             data: custoSemSolarMensal,
                             backgroundColor: 'rgba(231, 76, 60, 0.5)',
                             borderColor: 'rgba(231, 76, 60, 1)',
+                            borderWidth:
                             borderWidth: 1
                         },
                         {
