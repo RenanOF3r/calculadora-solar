@@ -191,11 +191,6 @@ ________________________________________________________________________________
             <div class="slider-value" id="valor-cobertura">100%</div>
         </div>
         <div class="input-group">
-            <label for="simultaneidade">Simultaneidade do Consumo (%)</label>
-            <input type="range" id="simultaneidade" value="70" max="100" min="0" oninput="atualizarValor('simultaneidade')">
-            <div class="slider-value" id="valor-simultaneidade">70%</div>
-        </div>
-        <div class="input-group">
             <label for="excedente">Excedente Desejado (%)</label>
             <input type="range" id="excedente" value="0" max="100" min="0" step="5" oninput="atualizarValor('excedente')">
             <div class="slider-value" id="valor-excedente">Excedente: 0%</div>
@@ -207,7 +202,6 @@ ________________________________________________________________________________
         </div>
         <button onclick="calcular()">Calcular</button>
 
-        <canvas id="graficoConsumoGeracao" width="400" height="200"></canvas>
         <canvas id="graficoEconomiaMensal" width="400" height="200"></canvas>
 
         <div class="result-box" id="resultados">
@@ -220,11 +214,6 @@ ________________________________________________________________________________
                 <i class="fas fa-th"></i>
                 <h4>Quantidade de Painéis</h4>
                 <p id="paineis">-</p>
-            </div>
-            <div class="result-item">
-                <i class="fas fa-ruler-combined"></i>
-                <h4>Área Ocupada</h4>
-                <p id="area">-</p>
             </div>
             <div class="result-item">
                 <i class="fas fa-piggy-bank"></i>
@@ -255,7 +244,6 @@ ________________________________________________________________________________
             const irradiacaoDiaria = 4.55;
             const consumo = converterParaNumero(document.getElementById('consumo').value) || 1633;
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
-            const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
             const excedente = parseFloat(document.getElementById('excedente').value) / 100;
             const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value) || 1.17;
             const eficiencia = 0.8;
@@ -265,6 +253,7 @@ ________________________________________________________________________________
             const cofins = 4.35 / 100;
             const icms = 24 / 100;
             const iluminacaoPublica = 60.94;
+            const tarifaMinima = 100 * tarifaSemImpostos; // Consumo mínimo de 100 kWh
 
             let erro = false;
 
@@ -290,19 +279,19 @@ ________________________________________________________________________________
             // Quantidade de painéis necessários
             const capacidadePorPainel = 0.55;
             const numeroDePaineis = Math.ceil(capacidade / capacidadePorPainel);
-            const areaPorPainel = 1.134 * 2.278;
-            const areaTotal = numeroDePaineis * areaPorPainel;
-            const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
-
+            
             // Tarifa com Impostos
             const tarifaComImpostos = tarifaSemImpostos * (1 + pis + cofins + icms);
 
-            // Economia mensal estimada e custo sem energia solar
+            // Cálculo dos custos
             const custoMensalSemSolar = consumo * tarifaComImpostos + iluminacaoPublica;
 
             // Calcular o consumo com solar e garantir um mínimo de 100 kWh
-            let consumoComSolar = Math.max(consumo * cobertura, 100);
-            const custoComSolarMensal = consumoComSolar * tarifaComImpostos + iluminacaoPublica;
+            let consumoComSolar = consumo * cobertura;
+            let custoComSolarMensal = consumoComSolar * tarifaComImpostos + iluminacaoPublica;
+
+            // Aplicar a tarifa mínima, se necessário
+            custoComSolarMensal = Math.max(custoComSolarMensal, tarifaMinima + iluminacaoPublica);
 
             // Economia mensal e anual
             const economiaMensal = custoMensalSemSolar - custoComSolarMensal;
@@ -311,7 +300,6 @@ ________________________________________________________________________________
             // Atualizar resultados na tela
             document.getElementById('capacidade').innerText = capacidadeFormatada;
             document.getElementById('paineis').innerText = `${numeroDePaineis} painéis de 550W`;
-            document.getElementById('area').innerText = areaFormatada;
             document.getElementById('economia').innerText = `R$ ${economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / Ano`;
 
             // Calcular ROI (Retorno sobre o Investimento)
@@ -319,77 +307,12 @@ ________________________________________________________________________________
             const anosParaRetorno = custoInstalacao / economiaAnual;
             document.getElementById('roi').innerText = anosParaRetorno.toFixed(1) + " anos";
 
-            // Definir sazonalidade para os 12 meses
+            // Definir sazonalidade para os 12 meses e desenhar o gráfico
             const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
-            const geracaoMensal = sazonalidade.map(fator => producaoMensalPorKwp * capacidade * fator);
-            desenharGraficoConsumoGeracao(consumo, geracaoMensal);
-
-            // Gerar gráficos mensais de economia
             const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-            const custoComSolarMensalArray = sazonalidade.map(fator => custoComSolarMensal * fator);
+            const custoComSolarMensalArray = sazonalidade.map(fator => Math.max(custoComSolarMensal * fator, tarifaMinima + iluminacaoPublica));
             const custoSemSolarMensalArray = sazonalidade.map(fator => custoMensalSemSolar * fator);
             desenharGraficoEconomiaMensal(meses, custoSemSolarMensalArray, custoComSolarMensalArray);
-        }
-
-        function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal) {
-            const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
-            document.getElementById('graficoConsumoGeracao').classList.add('show');
-
-            const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-
-            if (window.consumoGeracaoChart) {
-                window.consumoGeracaoChart.destroy();
-            }
-
-            window.consumoGeracaoChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: meses,
-                    datasets: [
-                        {
-                            label: 'CONSUMO KWh',
-                            data: Array(12).fill(consumoMensal),
-                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'GERAÇÃO KWh',
-                            data: geracaoMensal,
-                            backgroundColor: 'rgba(255, 206, 86, 0.5)',
-                            borderColor: 'rgba(255, 206, 86, 1)',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Gráfico de Consumo X Geração (Em 12 Meses)'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'kWh/Mês'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Meses'
-                            }
-                        }
-                    }
-                }
-            });
         }
 
         function desenharGraficoEconomiaMensal(meses, custoSemSolarMensal, custoComSolarMensal) {
