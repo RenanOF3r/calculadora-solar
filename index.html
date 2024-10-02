@@ -14,24 +14,231 @@ ________________________________________________________________________________
 
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora Solar Ajustada</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Manter o CSS original */
-        body, h1, .container, .input-group, label, input, select, .slider-value, .result-box, .result-item, button, canvas, .error-message {
-            /* Suas regras de estilo existentes */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        h1 {
+            color: #f39c12;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        select,
+        input[type="range"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        select:focus,
+        input[type="range"]:focus {
+            border-color: #3498db;
+        }
+
+        .slider-value {
+            text-align: right;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .result-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+            background-color: #f7f9fc;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-box .result-item {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .result-box .result-item:hover {
+            transform: scale(1.05);
+        }
+
+        .result-box h4 {
+            color: #3498db;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .result-box p {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .result-box i {
+            font-size: 2rem;
+            color: #f39c12;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            display: block;
+            margin: 20px auto;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        canvas {
+            margin-top: 30px;
+            max-width: 100%;
+            transition: opacity 1s;
+            opacity: 0;
+        }
+
+        canvas.show {
+            opacity: 1;
+        }
+
+        .error-message {
+            color: red;
+            display: none;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .result-box {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
     <h1>Calculadora Solar Ajustada</h1>
     <div class="container">
-        <!-- Elementos da interface do usuário -->
+        <div class="input-group">
+            <label for="cidade">Cidade</label>
+            <select id="cidade" disabled>
+                <option value="4.55" selected>Rio de Janeiro (RJ)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="consumo">Consumo médio mensal (kWh)</label>
+            <input type="text" id="consumo" placeholder="Digite seu consumo mensal (use vírgula para decimais)">
+            <span class="error-message" id="erro-consumo">Por favor, insira um valor válido para o consumo.</span>
+        </div>
+        <div class="input-group">
+            <label for="cobertura">Cobertura desejada (%)</label>
+            <input type="range" id="cobertura" value="100" max="100" min="0" oninput="atualizarValor('cobertura')">
+            <div class="slider-value" id="valor-cobertura">100%</div>
+        </div>
+        <div class="input-group">
+            <label for="simultaneidade">Simultaneidade do Consumo (%)</label>
+            <input type="range" id="simultaneidade" value="70" max="100" min="0" oninput="atualizarValor('simultaneidade')">
+            <div class="slider-value" id="valor-simultaneidade">70%</div>
+        </div>
+        <div class="input-group">
+            <label for="excedente">Excedente Desejado (%)</label>
+            <input type="range" id="excedente" value="0" max="100" min="0" step="5" oninput="atualizarValor('excedente')">
+            <div class="slider-value" id="valor-excedente">Excedente: 0%</div>
+        </div>
+        <div class="input-group">
+            <label for="tarifa">Tarifa de Energia (R$/kWh)</label>
+            <input type="text" id="tarifa" value="1,17" placeholder="Digite a tarifa de energia (use vírgula para decimais)">
+            <span class="error-message" id="erro-tarifa">Por favor, insira um valor válido para a tarifa.</span>
+        </div>
+        <button onclick="calcular()">Calcular</button>
+
+        <canvas id="graficoConsumoGeracao" width="400" height="200"></canvas>
+        <canvas id="graficoEconomiaMensal" width="400" height="200"></canvas>
+
+        <div class="result-box" id="resultados">
+            <div class="result-item">
+                <i class="fas fa-solar-panel"></i>
+                <h4>Capacidade (kWp)</h4>
+                <p id="capacidade">-</p>
+            </div>
+            <div class="result-item">
+                <i class="fas fa-th"></i>
+                <h4>Quantidade de Painéis</h4>
+                <p id="paineis">-</p>
+            </div>
+            <div class="result-item">
+                <i class="fas fa-ruler-combined"></i>
+                <h4>Área Ocupada</h4>
+                <p id="area">-</p>
+            </div>
+            <div class="result-item">
+                <i class="fas fa-piggy-bank"></i>
+                <h4>Economia Estimada</h4>
+                <p id="economia">-</p>
+            </div>
+            <div class="result-item">
+                <i class="fas fa-chart-line"></i>
+                <h4>Retorno Sobre Investimento (ROI)</h4>
+                <p id="roi">-</p>
+            </div>
+        </div>
     </div>
+
     <script>
         function atualizarValor(id) {
             const valor = document.getElementById(id).value;
@@ -48,6 +255,7 @@ ________________________________________________________________________________
             const irradiacaoDiaria = 4.55;
             const consumo = converterParaNumero(document.getElementById('consumo').value) || 1633;
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
+            const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
             const excedente = parseFloat(document.getElementById('excedente').value) / 100;
             const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value) || 1.17;
             const eficiencia = 0.8;
@@ -92,16 +300,9 @@ ________________________________________________________________________________
             // Economia mensal estimada e custo sem energia solar
             const custoMensalSemSolar = consumo * tarifaComImpostos + iluminacaoPublica;
 
-            let consumoComSolar = consumo * cobertura; // Considerando a cobertura desejada
-            let custoComSolarMensal;
-
-            // Ajuste para considerar o custo mínimo de 100 kWh/mês
-            if (consumoComSolar < 100) {
-                custoComSolarMensal = 100 * tarifaComImpostos + iluminacaoPublica; // Consumo mínimo de 100 kWh
-            } else {
-                const consumoNaoCoberto = consumo - consumoComSolar;
-                custoComSolarMensal = Math.max(consumoNaoCoberto * tarifaComImpostos, 100 * tarifaComImpostos) + iluminacaoPublica;
-            }
+            // Calcular o consumo com solar e garantir um mínimo de 100 kWh
+            let consumoComSolar = Math.max(consumo * cobertura, 100);
+            const custoComSolarMensal = consumoComSolar * tarifaComImpostos + iluminacaoPublica;
 
             // Economia mensal e anual
             const economiaMensal = custoMensalSemSolar - custoComSolarMensal;
@@ -262,4 +463,5 @@ ________________________________________________________________________________
         }
     </script>
 </body>
+
 </html>
