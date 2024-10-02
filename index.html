@@ -221,8 +221,13 @@ ________________________________________________________________________________
                 <p id="paineis">-</p>
             </div>
             <div class="result-item">
+                <i class="fas fa-ruler-combined"></i>
+                <h4>Área Ocupada (m²)</h4>
+                <p id="area">-</p>
+            </div>
+            <div class="result-item">
                 <i class="fas fa-lightbulb"></i>
-                <h4>Consumo Remanescente (kWh)</h4>
+                <h4>Consumo Não Coberto pela Geração Solar (kWh)</h4>
                 <p id="consumo-remanescente">-</p>
             </div>
             <div class="result-item">
@@ -290,25 +295,28 @@ ________________________________________________________________________________
             // Quantidade de painéis necessários
             const capacidadePorPainel = 0.55;
             const numeroDePaineis = Math.ceil(capacidade / capacidadePorPainel);
-            
+
+            // Área ocupada pelos painéis
+            const areaPorPainel = 1.134 * 2.278; // Área de um painel (em m²)
+            const areaTotal = numeroDePaineis * areaPorPainel;
+            const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
+
             // Tarifa com Impostos
             const tarifaComImpostos = tarifaSemImpostos * (1 + pis + cofins + icms);
 
             // Cálculo dos custos e consumo remanescente
             const energiaGerada = capacidade * producaoMensalPorKwp; // Energia gerada total
             const consumoImediato = energiaGerada * simultaneidade; // Consumo atendido imediatamente pela geração solar
-            const consumoNaoCoberto = consumo - consumoImediato; // Consumo não coberto diretamente
+            const consumoNaoCoberto = Math.max(consumo - consumoImediato, 0); // Consumo que não é coberto diretamente
 
             // Custo sem energia solar
             const custoMensalSemSolar = consumo * tarifaComImpostos + iluminacaoPublica;
 
             // Cálculo do custo com energia solar
-            let custoComSolarMensal;
-            if (consumoNaoCoberto > energiaGerada) {
-                custoComSolarMensal = (consumoNaoCoberto - energiaGerada) * tarifaComImpostos + iluminacaoPublica;
-            } else {
-                custoComSolarMensal = tarifaMinima + iluminacaoPublica; // Aplicando a tarifa mínima
-            }
+            let custoComSolarMensal = consumoNaoCoberto * tarifaComImpostos + iluminacaoPublica;
+
+            // Aplicar a tarifa mínima, se necessário
+            custoComSolarMensal = Math.max(custoComSolarMensal, tarifaMinima + iluminacaoPublica);
 
             // Economia mensal e anual
             const economiaMensal = custoMensalSemSolar - custoComSolarMensal;
@@ -317,6 +325,7 @@ ________________________________________________________________________________
             // Atualizar resultados na tela
             document.getElementById('capacidade').innerText = capacidadeFormatada;
             document.getElementById('paineis').innerText = `${numeroDePaineis} painéis de 550W`;
+            document.getElementById('area').innerText = areaFormatada;
             document.getElementById('consumo-remanescente').innerText = `${consumoNaoCoberto.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kWh`;
             document.getElementById('economia').innerText = `R$ ${economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / Ano`;
 
