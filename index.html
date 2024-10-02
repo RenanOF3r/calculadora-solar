@@ -18,7 +18,7 @@ ________________________________________________________________________________
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Solar Ajustada</title>
+    <title>Calculadora Solar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -125,9 +125,9 @@ ________________________________________________________________________________
 
         .tooltip {
             position: absolute;
-            top: -20px;
+            top: -10px;
             right: -10px;
-            font-size: 1rem;
+            font-size: 0.8rem;
             color: #3498db;
             cursor: pointer;
         }
@@ -140,11 +140,13 @@ ________________________________________________________________________________
             transform: translateX(-50%);
             background-color: #333;
             color: #fff;
-            padding: 5px;
+            padding: 8px;
             border-radius: 4px;
             white-space: nowrap;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            line-height: 1.2;
             z-index: 10;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         button {
@@ -196,7 +198,7 @@ ________________________________________________________________________________
 </head>
 
 <body>
-    <h1>Calculadora Solar Ajustada</h1>
+    <h1>Calculadora Solar</h1>
     <div class="container">
         <div class="input-group">
             <label for="cidade">Cidade</label>
@@ -237,37 +239,38 @@ ________________________________________________________________________________
         <div class="result-box" id="resultados">
             <div class="result-item">
                 <i class="fas fa-solar-panel"></i>
-                <h4>Capacidade (kWp) <i class="fas fa-info-circle tooltip" data-tooltip="Capacidade de geração do sistema em kWp"></i></h4>
+                <h4>Capacidade (kWp) <i class="fas fa-info-circle tooltip" data-tooltip="Capacidade de geração do sistema em kWp. Representa o tamanho do sistema necessário para atender ao consumo estimado."></i></h4>
                 <p id="capacidade">-</p>
             </div>
             <div class="result-item">
                 <i class="fas fa-th"></i>
-                <h4>Quantidade de Painéis <i class="fas fa-info-circle tooltip" data-tooltip="Número total de painéis solares necessários"></i></h4>
+                <h4>Quantidade de Painéis <i class="fas fa-info-circle tooltip" data-tooltip="Número total de painéis solares necessários para atingir a capacidade de geração desejada."></i></h4>
                 <p id="paineis">-</p>
             </div>
             <div class="result-item">
                 <i class="fas fa-ruler-combined"></i>
-                <h4>Área Ocupada (m²) <i class="fas fa-info-circle tooltip" data-tooltip="Área total ocupada pelos painéis solares"></i></h4>
+                <h4>Área Ocupada (m²) <i class="fas fa-info-circle tooltip" data-tooltip="Área total necessária para instalar todos os painéis solares."></i></h4>
                 <p id="area">-</p>
             </div>
             <div class="result-item">
                 <i class="fas fa-lightbulb"></i>
-                <h4>Consumo Não Coberto pela Geração Solar (kWh) <i class="fas fa-info-circle tooltip" data-tooltip="Energia consumida que não foi coberta pela geração solar"></i></h4>
+                <h4>Consumo Não Coberto pela Geração Solar (kWh) <i class="fas fa-info-circle tooltip" data-tooltip="Energia consumida que não foi coberta pela geração solar e será fornecida pela rede elétrica."></i></h4>
                 <p id="consumo-remanescente">-</p>
             </div>
             <div class="result-item">
                 <i class="fas fa-piggy-bank"></i>
-                <h4>Economia Estimada <i class="fas fa-info-circle tooltip" data-tooltip="Economia anual estimada devido ao uso de energia solar"></i></h4>
+                <h4>Economia Estimada <i class="fas fa-info-circle tooltip" data-tooltip="Economia anual estimada devido ao uso de energia solar."></i></h4>
                 <p id="economia">-</p>
             </div>
             <div class="result-item">
                 <i class="fas fa-chart-line"></i>
-                <h4>Retorno Sobre Investimento (ROI) <i class="fas fa-info-circle tooltip" data-tooltip="Tempo estimado para recuperar o investimento no sistema solar"></i></h4>
+                <h4>Retorno Sobre Investimento (ROI) <i class="fas fa-info-circle tooltip" data-tooltip="Tempo estimado em anos para recuperar o valor investido no sistema solar."></i></h4>
                 <p id="roi">-</p>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         function atualizarValor(id) {
             const valor = document.getElementById(id).value;
@@ -364,7 +367,7 @@ ________________________________________________________________________________
             const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
             const geracaoMensal = sazonalidade.map(fator => producaoMensalPorKwp * capacidade * fator);
             desenharGraficoConsumoGeracao(consumo, geracaoMensal);
-            
+
             const custoComSolarMensalArray = sazonalidade.map(fator => Math.max(custoComSolarMensal * fator, tarifaMinima + iluminacaoPublica));
             const custoSemSolarMensalArray = sazonalidade.map(fator => custoMensalSemSolar * fator);
             desenharGraficoEconomiaMensal(meses, custoSemSolarMensalArray, custoComSolarMensalArray);
@@ -388,15 +391,15 @@ ________________________________________________________________________________
                         {
                             label: 'CONSUMO KWh',
                             data: Array(12).fill(consumoMensal),
-                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(38, 107, 176, 0.7)',
+                            borderColor: 'rgba(38, 107, 176, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'GERAÇÃO KWh',
                             data: geracaoMensal,
-                            backgroundColor: 'rgba(255, 206, 86, 0.5)',
-                            borderColor: 'rgba(255, 206, 86, 1)',
+                            backgroundColor: 'rgba(204, 153, 0, 0.7)',
+                            borderColor: 'rgba(204, 153, 0, 1)',
                             borderWidth: 1
                         }
                     ]
@@ -447,15 +450,15 @@ ________________________________________________________________________________
                         {
                             label: 'Custo Sem Solar (R$)',
                             data: custoSemSolarMensal,
-                            backgroundColor: 'rgba(231, 76, 60, 0.5)',
+                            backgroundColor: 'rgba(231, 76, 60, 0.7)',
                             borderColor: 'rgba(231, 76, 60, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Custo Com Solar (R$)',
                             data: custoComSolarMensal,
-                            backgroundColor: 'rgba(46, 204, 113, 0.5)',
-                            borderColor: 'rgba(46, 204, 113, 1)',
+                            backgroundColor: 'rgba(39, 174, 96, 0.7)',
+                            borderColor: 'rgba(39, 174, 96, 1)',
                             borderWidth: 1
                         }
                     ]
