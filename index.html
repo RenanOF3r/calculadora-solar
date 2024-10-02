@@ -332,7 +332,7 @@ ________________________________________________________________________________
             document.getElementById('economia').innerText = `R$ ${economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / Ano`;
 
             // Calcular ROI (Retorno sobre o Investimento)
-            const custoInstalacao = capacidade * 5000; // Supondo um valor médio de R$5000 por kWp
+            const custoInstalacao = capacidade * 2500; // Supondo um valor médio de R$2500 por kWp
             const anosParaRetorno = custoInstalacao / economiaAnual;
             document.getElementById('roi').innerText = anosParaRetorno.toFixed(1) + " anos";
 
