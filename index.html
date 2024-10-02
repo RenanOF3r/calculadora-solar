@@ -333,18 +333,28 @@ ________________________________________________________________________________
 
             // Calcular ROI (Retorno sobre o Investimento)
             const custoInstalacao = capacidade * 2500; // Supondo um valor médio de R$2500 por kWp
-            const anosParaRetorno = custoInstalacao / economiaAnual;
-            document.getElementById('roi').innerText = anosParaRetorno.toFixed(1) + " anos";
+            const anosParaRetornoDecimal = custoInstalacao / economiaAnual;
+
+            // Conversão para anos e meses
+            const anos = Math.floor(anosParaRetornoDecimal);
+            const meses = Math.round((anosParaRetornoDecimal - anos) * 12);
+
+            // Exibir o ROI no formato "x anos e y meses"
+            let roiTexto = `${anos} ano${anos !== 1 ? 's' : ''}`;
+            if (meses > 0) {
+                roiTexto += ` e ${meses} mês${meses !== 1 ? 'es' : ''}`;
+            }
+            document.getElementById('roi').innerText = roiTexto;
 
             // Definir sazonalidade para os 12 meses e desenhar os gráficos
             const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
-            const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+            const mesesArray = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
             const geracaoMensal = sazonalidade.map(fator => producaoMensalPorKwp * capacidade * fator);
             desenharGraficoConsumoGeracao(consumo, geracaoMensal);
 
             const custoComSolarMensalArray = sazonalidade.map(fator => Math.max(custoComSolarMensal * fator, tarifaMinima + iluminacaoPublica));
             const custoSemSolarMensalArray = sazonalidade.map(fator => custoMensalSemSolar * fator);
-            desenharGraficoEconomiaMensal(meses, custoSemSolarMensalArray, custoComSolarMensalArray);
+            desenharGraficoEconomiaMensal(mesesArray, custoSemSolarMensalArray, custoComSolarMensalArray);
         }
 
         function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal) {
