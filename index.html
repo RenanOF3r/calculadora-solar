@@ -98,7 +98,7 @@ ________________________________________________________________________________
             border-radius: 8px;
             text-align: center;
             box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
+            position: relative;
         }
 
         .result-box .result-item:hover {
@@ -121,6 +121,30 @@ ________________________________________________________________________________
             font-size: 2rem;
             color: #f39c12;
             margin-bottom: 10px;
+        }
+
+        .tooltip {
+            position: absolute;
+            top: -20px;
+            right: -10px;
+            font-size: 1rem;
+            color: #3498db;
+            cursor: pointer;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 4px;
+            white-space: nowrap;
+            font-size: 0.8rem;
+            z-index: 10;
         }
 
         button {
@@ -197,8 +221,8 @@ ________________________________________________________________________________
         </div>
         <div class="input-group">
             <label for="excedente">Excedente Desejado (%)</label>
-            <input type="range" id="excedente" value="0" max="100" min="0" step="5" oninput="atualizarValor('excedente')">
-            <div class="slider-value" id="valor-excedente">Excedente: 0%</div>
+            <input type="range" id="excedente" value="15" max="100" min="0" step="5" oninput="atualizarValor('excedente')">
+            <div class="slider-value" id="valor-excedente">Excedente: 15%</div>
         </div>
         <div class="input-group">
             <label for="tarifa">Tarifa de Energia (R$/kWh)</label>
@@ -207,37 +231,38 @@ ________________________________________________________________________________
         </div>
         <button onclick="calcular()">Calcular</button>
 
+        <canvas id="graficoConsumoGeracao" width="400" height="200"></canvas>
         <canvas id="graficoEconomiaMensal" width="400" height="200"></canvas>
 
         <div class="result-box" id="resultados">
             <div class="result-item">
                 <i class="fas fa-solar-panel"></i>
-                <h4>Capacidade (kWp)</h4>
+                <h4>Capacidade (kWp) <i class="fas fa-info-circle tooltip" data-tooltip="Capacidade de geração do sistema em kWp"></i></h4>
                 <p id="capacidade">-</p>
             </div>
             <div class="result-item">
                 <i class="fas fa-th"></i>
-                <h4>Quantidade de Painéis</h4>
+                <h4>Quantidade de Painéis <i class="fas fa-info-circle tooltip" data-tooltip="Número total de painéis solares necessários"></i></h4>
                 <p id="paineis">-</p>
             </div>
             <div class="result-item">
                 <i class="fas fa-ruler-combined"></i>
-                <h4>Área Ocupada (m²)</h4>
+                <h4>Área Ocupada (m²) <i class="fas fa-info-circle tooltip" data-tooltip="Área total ocupada pelos painéis solares"></i></h4>
                 <p id="area">-</p>
             </div>
             <div class="result-item">
                 <i class="fas fa-lightbulb"></i>
-                <h4>Consumo Não Coberto pela Geração Solar (kWh)</h4>
+                <h4>Consumo Não Coberto pela Geração Solar (kWh) <i class="fas fa-info-circle tooltip" data-tooltip="Energia consumida que não foi coberta pela geração solar"></i></h4>
                 <p id="consumo-remanescente">-</p>
             </div>
             <div class="result-item">
                 <i class="fas fa-piggy-bank"></i>
-                <h4>Economia Estimada</h4>
+                <h4>Economia Estimada <i class="fas fa-info-circle tooltip" data-tooltip="Economia anual estimada devido ao uso de energia solar"></i></h4>
                 <p id="economia">-</p>
             </div>
             <div class="result-item">
                 <i class="fas fa-chart-line"></i>
-                <h4>Retorno Sobre Investimento (ROI)</h4>
+                <h4>Retorno Sobre Investimento (ROI) <i class="fas fa-info-circle tooltip" data-tooltip="Tempo estimado para recuperar o investimento no sistema solar"></i></h4>
                 <p id="roi">-</p>
             </div>
         </div>
@@ -334,12 +359,76 @@ ________________________________________________________________________________
             const anosParaRetorno = custoInstalacao / economiaAnual;
             document.getElementById('roi').innerText = anosParaRetorno.toFixed(1) + " anos";
 
-            // Definir sazonalidade para os 12 meses e desenhar o gráfico
+            // Definir sazonalidade para os 12 meses e desenhar os gráficos
             const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
             const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+            const geracaoMensal = sazonalidade.map(fator => producaoMensalPorKwp * capacidade * fator);
+            desenharGraficoConsumoGeracao(consumo, geracaoMensal);
+            
             const custoComSolarMensalArray = sazonalidade.map(fator => Math.max(custoComSolarMensal * fator, tarifaMinima + iluminacaoPublica));
             const custoSemSolarMensalArray = sazonalidade.map(fator => custoMensalSemSolar * fator);
             desenharGraficoEconomiaMensal(meses, custoSemSolarMensalArray, custoComSolarMensalArray);
+        }
+
+        function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal) {
+            const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
+            document.getElementById('graficoConsumoGeracao').classList.add('show');
+
+            const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+            if (window.consumoGeracaoChart) {
+                window.consumoGeracaoChart.destroy();
+            }
+
+            window.consumoGeracaoChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: meses,
+                    datasets: [
+                        {
+                            label: 'CONSUMO KWh',
+                            data: Array(12).fill(consumoMensal),
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'GERAÇÃO KWh',
+                            data: geracaoMensal,
+                            backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Gráfico de Consumo X Geração (Em 12 Meses)'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'kWh/Mês'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Meses'
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function desenharGraficoEconomiaMensal(meses, custoSemSolarMensal, custoComSolarMensal) {
