@@ -329,15 +329,16 @@ ________________________________________________________________________________
             }
             document.getElementById('roi').innerText = roiTexto;
 
-            desenharGraficoConsumoGeracao(consumo, capacidade);
-            desenharGraficoEconomiaMensal(consumo, economiaMensal);
+            desenharGraficoConsumoGeracao(consumo, capacidade, producaoMensalPorKwp);
+            desenharGraficoEconomiaMensal(economiaMensal);
         }
 
-        function desenharGraficoConsumoGeracao(consumoMensal, capacidade) {
+        function desenharGraficoConsumoGeracao(consumoMensal, capacidade, producaoMensalPorKwp) {
             const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
             document.getElementById('graficoConsumoGeracao').classList.add('show');
 
             const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+            const geracaoMensal = Array(12).fill(capacidade * producaoMensalPorKwp);
 
             if (window.consumoGeracaoChart) {
                 window.consumoGeracaoChart.destroy();
@@ -357,7 +358,7 @@ ________________________________________________________________________________
                         },
                         {
                             label: 'GERAÇÃO KWh',
-                            data: Array(12).fill(capacidade * 4.55 * 30 * 0.8),
+                            data: geracaoMensal,
                             backgroundColor: 'rgba(255, 206, 86, 0.6)',
                             borderColor: 'rgba(255, 206, 86, 1)',
                             borderWidth: 1
@@ -394,11 +395,12 @@ ________________________________________________________________________________
             });
         }
 
-        function desenharGraficoEconomiaMensal(consumoMensal, economiaMensal) {
+        function desenharGraficoEconomiaMensal(economiaMensal) {
             const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
             document.getElementById('graficoEconomiaMensal').classList.add('show');
 
             const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+            const economiaMensalArray = Array(12).fill(economiaMensal);
 
             if (window.economiaMensalChart) {
                 window.economiaMensalChart.destroy();
@@ -411,7 +413,7 @@ ________________________________________________________________________________
                     datasets: [
                         {
                             label: 'Economia Mensal (R$)',
-                            data: Array(12).fill(economiaMensal),
+                            data: economiaMensalArray,
                             backgroundColor: 'rgba(39, 174, 96, 0.7)',
                             borderColor: 'rgba(39, 174, 96, 1)',
                             borderWidth: 1
