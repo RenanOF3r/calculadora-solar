@@ -333,7 +333,7 @@ ________________________________________________________________________________
             const geracaoMensal = sazonalidade.map(fator => capacidade * producaoMensalPorKwp * fator);
 
             desenharGraficoConsumoGeracao(consumo, geracaoMensal);
-            desenharGraficoEconomiaMensal(consumo, geracaoMensal, tarifaSemImpostos, sazonalidade);
+            desenharGraficoEconomiaMensal(consumo, geracaoMensal, tarifaSemImpostos);
         }
 
         function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal) {
@@ -397,14 +397,13 @@ ________________________________________________________________________________
             });
         }
 
-        function desenharGraficoEconomiaMensal(consumoMensal, geracaoMensal, tarifaSemImpostos, sazonalidade) {
+        function desenharGraficoEconomiaMensal(consumoMensal, geracaoMensal, tarifaSemImpostos) {
             const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
             document.getElementById('graficoEconomiaMensal').classList.add('show');
 
             const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
             const custoSemSolarMensal = Array(12).fill(consumoMensal * tarifaSemImpostos);
-            const custoComSolarMensal = custoSemSolarMensal.map((custo, index) => {
-                const energiaGerada = geracaoMensal[index];
+            const custoComSolarMensal = geracaoMensal.map((energiaGerada, index) => {
                 const consumoNaoCoberto = Math.max(consumoMensal - energiaGerada, 0);
                 return consumoNaoCoberto * tarifaSemImpostos;
             });
