@@ -145,7 +145,8 @@ ________________________________________________________________________________
         canvas {
             display: none;
             margin-top: 30px;
-            max-width: 100%;
+            width: 100%;
+            height: 300px;
         }
 
         canvas.show {
@@ -337,10 +338,11 @@ ________________________________________________________________________________
             document.getElementById('roi').innerText = `${anos} anos e ${meses} meses`;
 
             // Mostrar gráficos
-            desenharGraficoConsumoGeracao(consumo, capacidade, diasMes, producaoMensalPorKwp);
+            desenharGraficoConsumoGeracao(consumo, producaoMensalPorKwp, capacidade);
+            desenharGraficoEconomiaMensal(economiaMensal);
         }
 
-        function desenharGraficoConsumoGeracao(consumo, capacidade, diasMes, producaoMensalPorKwp) {
+        function desenharGraficoConsumoGeracao(consumo, producaoMensalPorKwp, capacidade) {
             const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
             document.getElementById('graficoConsumoGeracao').classList.add('show');
 
@@ -356,6 +358,37 @@ ________________________________________________________________________________
                         backgroundColor: ['rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)'],
                         borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
                         borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function desenharGraficoEconomiaMensal(economiaMensal) {
+            const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
+            document.getElementById('graficoEconomiaMensal').classList.add('show');
+
+            const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+            const economiaMensalArray = Array(12).fill(economiaMensal);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: meses,
+                    datasets: [{
+                        label: 'Economia Mensal (R$)',
+                        data: economiaMensalArray,
+                        backgroundColor: 'rgba(46, 204, 113, 0.6)',
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        borderWidth: 2,
+                        fill: true
                     }]
                 },
                 options: {
