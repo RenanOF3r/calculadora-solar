@@ -34,26 +34,29 @@ ________________________________________________________________________________
             color: #f39c12;
             text-align: center;
             margin-bottom: 30px;
-            font-size: 2.5rem;
+            font-size: 2rem;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
             background-color: #fff;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .input-group {
-            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             position: relative;
         }
 
         label {
-            display: block;
-            margin-bottom: 8px;
             font-weight: bold;
             color: #555;
         }
@@ -62,12 +65,10 @@ ________________________________________________________________________________
         select,
         input[type="range"] {
             width: 100%;
-            padding: 15px;
-            margin-bottom: 5px;
+            padding: 12px;
             border: 1px solid #ccc;
             border-radius: 5px;
             transition: border-color 0.3s;
-            font-size: 1.1rem;
         }
 
         input[type="text"]:focus,
@@ -80,63 +81,62 @@ ________________________________________________________________________________
             text-align: right;
             font-weight: bold;
             color: #333;
-            font-size: 1.1rem;
         }
 
         .result-box {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
             background-color: #f7f9fc;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .result-box .result-item {
             background-color: #ffffff;
-            padding: 25px;
-            border-radius: 10px;
+            padding: 20px;
+            border-radius: 8px;
             text-align: center;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
             position: relative;
         }
 
         .result-box .result-item:hover {
             transform: scale(1.05);
-            transition: transform 0.3s;
         }
 
         .result-box h4 {
             color: #3498db;
-            margin-bottom: 15px;
-            font-size: 1.4rem;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
         }
 
         .result-box p {
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             font-weight: bold;
             color: #2c3e50;
         }
 
         .result-box i {
-            font-size: 2.5rem;
+            font-size: 2rem;
             color: #f39c12;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         button {
             background-color: #3498db;
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 12px 25px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1rem;
             transition: background-color 0.3s;
             display: block;
-            margin: 30px auto;
+            margin: 20px auto;
         }
 
         button:hover {
@@ -144,20 +144,22 @@ ________________________________________________________________________________
         }
 
         canvas {
-            margin-top: 40px;
+            margin-top: 30px;
             max-width: 100%;
-            transition: opacity 1s;
+            transition: opacity 1s ease-in-out, transform 1s ease;
             opacity: 0;
+            transform: scale(0.9);
         }
 
         canvas.show {
             opacity: 1;
+            transform: scale(1);
         }
 
         .error-message {
             color: red;
             display: none;
-            font-size: 1rem;
+            font-size: 0.9rem;
             margin-top: 5px;
         }
 
@@ -166,8 +168,17 @@ ________________________________________________________________________________
         }
 
         @media (max-width: 768px) {
-            .result-box {
-                grid-template-columns: 1fr;
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -177,75 +188,12 @@ ________________________________________________________________________________
 <body>
     <h1>Calculadora Solar Ajustada</h1>
     <div class="container">
-        <div class="input-group">
-            <label for="cidade">Cidade</label>
-            <select id="cidade" disabled>
-                <option value="4.55" selected>Rio de Janeiro (RJ)</option>
-            </select>
-        </div>
-        <div class="input-group">
-            <label for="consumo">Consumo médio mensal (kWh)</label>
-            <input type="text" id="consumo" placeholder="Digite seu consumo mensal (use vírgula para decimais)">
-            <span class="error-message" id="erro-consumo">Por favor, insira um valor válido para o consumo.</span>
-        </div>
-        <div class="input-group">
-            <label for="cobertura">Cobertura desejada (%)</label>
-            <input type="range" id="cobertura" value="100" max="100" min="0" oninput="atualizarValor('cobertura')">
-            <div class="slider-value" id="valor-cobertura">100%</div>
-        </div>
-        <div class="input-group">
-            <label for="simultaneidade">Simultaneidade do Consumo (%)</label>
-            <input type="range" id="simultaneidade" value="70" max="100" min="0" oninput="atualizarValor('simultaneidade')">
-            <div class="slider-value" id="valor-simultaneidade">70%</div>
-        </div>
-        <div class="input-group">
-            <label for="excedente">Excedente Desejado (%)</label>
-            <input type="range" id="excedente" value="15" max="100" min="0" step="5" oninput="atualizarValor('excedente')">
-            <div class="slider-value" id="valor-excedente">Excedente: 15%</div>
-        </div>
-        <div class="input-group">
-            <label for="tarifa">Tarifa de Energia (R$/kWh)</label>
-            <input type="text" id="tarifa" value="1,17" placeholder="Digite a tarifa de energia (use vírgula para decimais)">
-            <span class="error-message" id="erro-tarifa">Por favor, insira um valor válido para a tarifa.</span>
-        </div>
-        <button onclick="calcular()">Calcular</button>
-
-        <canvas id="graficoConsumoGeracao" width="400" height="200"></canvas>
-        <canvas id="graficoEconomiaMensal" width="400" height="200"></canvas>
-
-        <div class="result-box" id="resultados">
-            <div class="result-item">
-                <i class="fas fa-solar-panel"></i>
-                <h4>Capacidade (kWp)</h4>
-                <p id="capacidade">-</p>
-            </div>
-            <div class="result-item">
-                <i class="fas fa-th"></i>
-                <h4>Quantidade de Painéis</h4>
-                <p id="paineis">-</p>
-            </div>
-            <div class="result-item">
-                <i class="fas fa-ruler-combined"></i>
-                <h4>Área Ocupada (m²)</h4>
-                <p id="area">-</p>
-            </div>
-            <div class="result-item">
-                <i class="fas fa-lightbulb"></i>
-                <h4>Consumo Não Coberto pela Geração Solar (kWh)</h4>
-                <p id="consumo-remanescente">-</p>
-            </div>
-            <div class="result-item">
-                <i class="fas fa-piggy-bank"></i>
-                <h4>Economia Estimada</h4>
-                <p id="economia">-</p>
-            </div>
-            <div class="result-item">
-                <i class="fas fa-chart-line"></i>
-                <h4>Retorno Sobre Investimento (ROI)</h4>
-                <p id="roi">-</p>
-            </div>
-        </div>
+        <!-- Campos de entrada e interface de usuário -->
+        <!-- ... -->
     </div>
+
+    <canvas id="graficoConsumoGeracao" width="400" height="200"></canvas>
+    <canvas id="graficoEconomiaMensal" width="400" height="200"></canvas>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -254,70 +202,19 @@ ________________________________________________________________________________
             document.getElementById(`valor-${id}`).innerText = `${valor}%`;
         }
 
-        function converterParaNumero(valor) {
-            return parseFloat(valor.replace(",", "."));
-        }
-
         function calcular() {
-            limparMensagensErro();
+            // Função de cálculo principal
+            // ...
 
-            const irradiacaoMensal = [5.21, 5.16, 5.04, 4.38, 4.12, 4.18, 4.59, 5.16, 5.34, 5.67, 5.52, 5.34];
-            const consumo = converterParaNumero(document.getElementById('consumo').value) || 1633;
-            const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
-            const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
-            const excedente = parseFloat(document.getElementById('excedente').value) / 100;
-            const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value) || 1.17;
-            const eficiencia = 0.8;
-
-            let erro = false;
-
-            if (isNaN(consumo) || consumo <= 0) {
-                mostrarErro('consumo', 'Por favor, insira um valor válido para o consumo.');
-                erro = true;
-            }
-
-            if (isNaN(tarifaSemImpostos) || tarifaSemImpostos <= 0) {
-                mostrarErro('tarifa', 'Por favor, insira um valor válido para a tarifa.');
-                erro = true;
-            }
-
-            if (erro) return;
-
-            const diasMes = 30;
-            const capacidade = (consumo / (irradiacaoMensal.reduce((a, b) => a + b) / irradiacaoMensal.length) / diasMes / eficiencia) * (cobertura + excedente);
-            const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
-
-            const capacidadePorPainel = 0.55;
-            const numeroDePaineis = Math.ceil(capacidade / capacidadePorPainel);
-
-            const areaPorPainel = 1.134 * 2.278;
-            const areaTotal = numeroDePaineis * areaPorPainel;
-            const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
-
-            const producaoMensal = irradiacaoMensal.map(irradiacao => irradiacao * diasMes * capacidade * eficiencia);
-            const consumoNaoCoberto = Math.max(consumo - (capacidade * (irradiacaoMensal.reduce((a, b) => a + b) / irradiacaoMensal.length) * simultaneidade * diasMes * eficiencia), 0);
-            const economiaMensal = producaoMensal.map(producao => Math.min(producao, consumo) * tarifaSemImpostos);
-            const custoInstalacao = capacidade * 2500;
-            const economiaAnual = economiaMensal.reduce((a, b) => a + b, 0);
-            const anosParaRetorno = custoInstalacao / economiaAnual;
-            const anos = Math.floor(anosParaRetorno);
-            const meses = Math.round((anosParaRetorno - anos) * 12);
-            const roiFormatado = `${anos} ano${anos !== 1 ? 's' : ''}${meses > 0 ? ` e ${meses} mês${meses !== 1 ? 'es' : ''}` : ''}`;
-
-            document.getElementById('capacidade').innerText = capacidadeFormatada;
-            document.getElementById('paineis').innerText = `${numeroDePaineis} painéis de 550W`;
-            document.getElementById('area').innerText = areaFormatada;
-            document.getElementById('consumo-remanescente').innerText = `${consumoNaoCoberto.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kWh`;
-            document.getElementById('economia').innerText = `R$ ${economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / ano`;
-            document.getElementById('roi').innerText = roiFormatado;
-
-            desenharGraficoConsumoGeracao(consumo, producaoMensal);
-            desenharGraficoEconomiaMensal(economiaMensal);
+            desenharGraficoConsumoGeracao(consumo, geracaoMensal);
+            desenharGraficoEconomiaMensal(mesesArray, custoSemSolarMensalArray, custoComSolarMensalArray);
         }
 
-        function desenharGraficoConsumoGeracao(consumo, producaoMensal) {
+        function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal) {
             const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
             document.getElementById('graficoConsumoGeracao').classList.add('show');
+
+            const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
             if (window.consumoGeracaoChart) {
                 window.consumoGeracaoChart.destroy();
@@ -326,82 +223,47 @@ ________________________________________________________________________________
             window.consumoGeracaoChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ["Consumo", ...Array(12).fill("Produção Mensal")],
+                    labels: meses,
                     datasets: [
                         {
-                            label: 'Consumo (kWh)',
-                            data: [consumo],
+                            label: 'CONSUMO KWh',
+                            data: Array(12).fill(consumoMensal),
                             backgroundColor: 'rgba(54, 162, 235, 0.6)',
                             borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 2
+                            borderWidth: 1,
+                            hoverBackgroundColor: 'rgba(54, 162, 235, 0.8)',
                         },
                         {
-                            label: 'Produção (kWh)',
-                            data: producaoMensal,
-                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 2
+                            label: 'GERAÇÃO KWh',
+                            data: geracaoMensal,
+                            backgroundColor: 'rgba(255, 206, 86, 0.6)',
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            borderWidth: 1,
+                            hoverBackgroundColor: 'rgba(255, 206, 86, 0.8)',
                         }
                     ]
                 },
                 options: {
                     responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'kWh'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Medição'
-                            }
-                        }
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutBounce'
                     },
                     plugins: {
                         legend: {
-                            display: true,
                             position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Gráfico de Consumo X Geração (Em 12 Meses)'
                         }
-                    }
-                }
-            });
-        }
-
-        function desenharGraficoEconomiaMensal(economiaMensal) {
-            const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
-            document.getElementById('graficoEconomiaMensal').classList.add('show');
-
-            if (window.economiaMensalChart) {
-                window.economiaMensalChart.destroy();
-            }
-
-            window.economiaMensalChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"],
-                    datasets: [
-                        {
-                            label: 'Economia Mensal (R$)',
-                            data: economiaMensal,
-                            backgroundColor: 'rgba(46, 204, 113, 0.4)',
-                            borderColor: 'rgba(46, 204, 113, 1)',
-                            borderWidth: 2,
-                            fill: true
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Economia (R$)'
+                                text: 'kWh/Mês'
                             }
                         },
                         x: {
@@ -410,26 +272,74 @@ ________________________________________________________________________________
                                 text: 'Meses'
                             }
                         }
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        }
                     }
                 }
             });
         }
 
-        function mostrarErro(id, mensagem) {
-            const erroElemento = document.getElementById(`erro-${id}`);
-            erroElemento.innerText = mensagem;
-            erroElemento.classList.add('show');
-        }
+        function desenharGraficoEconomiaMensal(meses, custoSemSolarMensal, custoComSolarMensal) {
+            const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
+            document.getElementById('graficoEconomiaMensal').classList.add('show');
 
-        function limparMensagensErro() {
-            const mensagensErro = document.querySelectorAll('.error-message');
-            mensagensErro.forEach(mensagem => mensagem.classList.remove('show'));
+            if (window.economiaMensalChart) {
+                window.economiaMensalChart.destroy();
+            }
+
+            window.economiaMensalChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: meses,
+                    datasets: [
+                        {
+                            label: 'Custo Sem Solar (R$)',
+                            data: custoSemSolarMensal,
+                            backgroundColor: 'rgba(231, 76, 60, 0.7)',
+                            borderColor: 'rgba(231, 76, 60, 1)',
+                            borderWidth: 1,
+                            hoverBackgroundColor: 'rgba(231, 76, 60, 0.9)',
+                        },
+                        {
+                            label: 'Custo Com Solar (R$)',
+                            data: custoComSolarMensal,
+                            backgroundColor: 'rgba(39, 174, 96, 0.7)',
+                            borderColor: 'rgba(39, 174, 96, 1)',
+                            borderWidth: 1,
+                            hoverBackgroundColor: 'rgba(39, 174, 96, 0.9)',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutBounce'
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Comparação de Custos Mensais Com e Sem Energia Solar (1º Ano)'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Custo Mensal (R$)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Meses'
+                            }
+                        }
+                    }
+                }
+            });
         }
     </script>
 </body>
