@@ -345,7 +345,7 @@ ________________________________________________________________________________
             const economiaAnual = economiaMensal * 12;
             document.getElementById('economia-estimada').innerText = `R$ ${economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             
-            const custoTotalSistema = capacidade * 5500; // Exemplo de custo por kWp
+            const custoTotalSistema = capacidade * 2500; // Exemplo de custo por kWp
             const roi = (economiaAnual > 0 ? custoTotalSistema / economiaAnual : 0).toFixed(2);
             document.getElementById('roi').innerText = `${roi} anos`;
 
