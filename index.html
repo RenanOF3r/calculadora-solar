@@ -222,10 +222,15 @@ ________________________________________________________________________________
         <button onclick="calcular()">Calcular</button>
     </div>
 
-    200200
-    200200
+    <canvas id="graficoConsumoGeracao" width="200" height="200"></canvas>
+    <canvas id="graficoEconomiaMensal" width="200" height="200"></canvas>
 
-    
+    <div class="result-box" id="resultados">
+        <div class="result-item">
+            <i class="fas fa-th"></i>
+            <h4>Quantidade de Painéis</h4>
+            <p id="painel-quantidade">-</p>
+        </div>
         <div class="result-item">
             <i class="fas fa-ruler-combined"></i>
             <h4>Área Total Necessária</h4>
@@ -284,8 +289,8 @@ ________________________________________________________________________________
             const producaoMensalPorKwp = irradiacaoDiaria * diasMes * eficiencia;
 
             const capacidade = (consumo / producaoMensalPorKwp) * (cobertura + excedente);
-                        document.getElementById('capacidade-sistema').innerText = capacidadeFormatada;
-            document.getElementById('area-total').innerText = areaFormatada;
+            const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
+            document.getElementById('capacidade-sistema').innerText = capacidadeFormatada;
 
             const capacidadePorPainel = 0.55;
             const numeroDePaineis = Math.ceil(capacidade / capacidadePorPainel);
@@ -294,6 +299,7 @@ ________________________________________________________________________________
             const areaPorPainel = 1.134 * 2.278;
             const areaTotal = numeroDePaineis * areaPorPainel;
             const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
+            document.getElementById('area-total').innerText = areaFormatada;
 
             const tarifaComImpostos = tarifaSemImpostos * (1 + pis + cofins + icms);
 
