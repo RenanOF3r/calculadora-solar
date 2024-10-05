@@ -331,9 +331,9 @@ ________________________________________________________________________________
                         {
                             label: 'kWh',
                             data: [consumo, geracao],
-                            backgroundColor: ['rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)'],
-                            borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
-                            borderWidth: 1
+                            backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)'],
+                            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                            borderWidth: 2
                         }
                     ]
                 },
@@ -352,6 +352,12 @@ ________________________________________________________________________________
                                 display: true,
                                 text: 'Medição'
                             }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
                         }
                     }
                 }
@@ -372,19 +378,11 @@ ________________________________________________________________________________
                     labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"],
                     datasets: [
                         {
-                            label: 'Consumo Não Coberto (kWh)',
-                            data: Array(12).fill(consumoNaoCoberto),
-                            backgroundColor: 'rgba(231, 76, 60, 0.4)',
-                            borderColor: 'rgba(231, 76, 60, 1)',
-                            borderWidth: 1,
-                            fill: true
-                        },
-                        {
-                            label: 'Geração Solar (kWh)',
-                            data: Array(12).fill(geracao),
+                            label: 'Economia Mensal (R$)',
+                            data: Array(12).fill((consumo - consumoNaoCoberto) * tarifaSemImpostos),
                             backgroundColor: 'rgba(46, 204, 113, 0.4)',
                             borderColor: 'rgba(46, 204, 113, 1)',
-                            borderWidth: 1,
+                            borderWidth: 2,
                             fill: true
                         }
                     ]
@@ -396,7 +394,7 @@ ________________________________________________________________________________
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'kWh'
+                                text: 'Economia (R$)'
                             }
                         },
                         x: {
@@ -404,6 +402,12 @@ ________________________________________________________________________________
                                 display: true,
                                 text: 'Meses'
                             }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
                         }
                     }
                 }
