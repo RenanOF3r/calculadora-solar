@@ -47,6 +47,7 @@ ________________________________________________________________________________
             display: flex;
             flex-direction: column;
             gap: 20px;
+            width: 100%;
         }
 
         .input-group {
@@ -85,13 +86,14 @@ ________________________________________________________________________________
 
         .result-box {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-top: 30px;
             background-color: #f7f9fc;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
         }
 
         .result-box .result-item {
@@ -137,6 +139,8 @@ ________________________________________________________________________________
             transition: background-color 0.3s;
             display: block;
             margin: 20px auto;
+            width: 100%;
+            max-width: 200px;
         }
 
         button:hover {
@@ -146,6 +150,7 @@ ________________________________________________________________________________
         canvas {
             margin-top: 30px;
             max-width: 100%;
+            height: auto;
             transition: opacity 1s ease-in-out, transform 1s ease;
             opacity: 0;
             transform: scale(0.9);
@@ -179,6 +184,15 @@ ________________________________________________________________________________
             button {
                 padding: 10px 20px;
                 font-size: 0.9rem;
+                max-width: 150px;
+            }
+
+            .result-box p {
+                font-size: 1.2rem;
+            }
+
+            .result-box h4 {
+                font-size: 1rem;
             }
         }
     </style>
