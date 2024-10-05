@@ -346,7 +346,10 @@ ________________________________________________________________________________
             document.getElementById('economia-estimada').innerText = `R$ ${economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             
             const custoTotalSistema = capacidade * 2500; // Exemplo de custo por kWp
-            const roi = (economiaAnual > 0 ? custoTotalSistema / economiaAnual : 0).toFixed(2);
+            const roiTotalMeses = economiaAnual > 0 ? (custoTotalSistema / economiaAnual) * 12 : 0;
+            const roiAnos = Math.floor(roiTotalMeses / 12);
+            const roiMeses = Math.round(roiTotalMeses % 12);
+            const roi = `${roiAnos} anos e ${roiMeses} meses`;
             document.getElementById('roi').innerText = `${roi} anos`;
 
             const pr = ((energiaGerada / (capacidade * producaoMensalPorKwp * 12)) * 100).toFixed(2) + '%';
