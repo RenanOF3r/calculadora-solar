@@ -222,14 +222,19 @@ ________________________________________________________________________________
         <button onclick="calcular()">Calcular</button>
     </div>
 
-    <canvas id="graficoConsumoGeracao" width="400" height="200"></canvas>
-    <canvas id="graficoEconomiaMensal" width="400" height="200"></canvas>
+    200200
+    200200
 
-    <div class="result-box" id="resultados">
+    
         <div class="result-item">
-            <i class="fas fa-th"></i>
-            <h4>Quantidade de Painéis</h4>
-            <p id="painel-quantidade">-</p>
+            <i class="fas fa-ruler-combined"></i>
+            <h4>Área Total Necessária</h4>
+            <p id="area-total">-</p>
+        </div>
+        <div class="result-item">
+            <i class="fas fa-sun"></i>
+            <h4>Capacidade do Sistema</h4>
+            <p id="capacidade-sistema">-</p>
         </div>
     </div>
 
@@ -279,7 +284,8 @@ ________________________________________________________________________________
             const producaoMensalPorKwp = irradiacaoDiaria * diasMes * eficiencia;
 
             const capacidade = (consumo / producaoMensalPorKwp) * (cobertura + excedente);
-            const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
+                        document.getElementById('capacidade-sistema').innerText = capacidadeFormatada;
+            document.getElementById('area-total').innerText = areaFormatada;
 
             const capacidadePorPainel = 0.55;
             const numeroDePaineis = Math.ceil(capacidade / capacidadePorPainel);
