@@ -229,8 +229,14 @@ ________________________________________________________________________________
         <button onclick="calcular()">Calcular</button>
     </div>
 
-    <canvas id="graficoConsumoGeracao" width="400" height="200"></canvas>
-    <canvas id="graficoEconomiaMensal" width="400" height="200"></canvas>
+    <canvas id="graficoConsumoGeracao" width="400" height="200">
+    <div class="result-box" id="resultados">
+        <div class="result-item">
+            <i class="fas fa-th"></i>
+            <h4>Quantidade de Painéis</h4>
+            <p id="painel-quantidade">-</p>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -283,12 +289,10 @@ ________________________________________________________________________________
             const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
 
             // Quantidade de painéis necessários
-            const capacidadePorPainel = 0.55;
-            
+                        const numeroDePaineis = Math.ceil(capacidade / capacidadePorPainel);
             document.getElementById('painel-quantidade').innerText = `${numeroDePaineis} painéis de 550W`;
 
-            // Área ocupada pelos painéis
-            const areaPorPainel = 1.134 * 2.278; // Área de um painel (em m²)
+             // Área de um painel (em m²)
             const areaTotal = numeroDePaineis * areaPorPainel;
             const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
 
