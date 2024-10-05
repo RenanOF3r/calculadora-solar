@@ -312,7 +312,7 @@ ________________________________________________________________________________
             document.getElementById('roi').innerText = roiFormatado;
 
             desenharGraficoConsumoGeracao(consumo, capacidade * producaoMensalPorKwp);
-            desenharGraficoEconomiaMensal(consumo, consumoNaoCoberto, capacidade * producaoMensalPorKwp);
+            desenharGraficoEconomiaMensal(economiaMensal);
         }
 
         function desenharGraficoConsumoGeracao(consumo, geracao) {
@@ -329,10 +329,17 @@ ________________________________________________________________________________
                     labels: ["Consumo", "Geração"],
                     datasets: [
                         {
-                            label: 'kWh',
-                            data: [consumo, geracao],
-                            backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)'],
-                            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                            label: 'Consumo (kWh)',
+                            data: [consumo],
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Geração (kWh)',
+                            data: [geracao],
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
                             borderWidth: 2
                         }
                     ]
@@ -364,7 +371,7 @@ ________________________________________________________________________________
             });
         }
 
-        function desenharGraficoEconomiaMensal(consumo, consumoNaoCoberto, geracao) {
+        function desenharGraficoEconomiaMensal(economiaMensal) {
             const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
             document.getElementById('graficoEconomiaMensal').classList.add('show');
 
@@ -379,7 +386,7 @@ ________________________________________________________________________________
                     datasets: [
                         {
                             label: 'Economia Mensal (R$)',
-                            data: Array(12).fill((consumo - consumoNaoCoberto) * tarifaSemImpostos),
+                            data: Array(12).fill(economiaMensal),
                             backgroundColor: 'rgba(46, 204, 113, 0.4)',
                             borderColor: 'rgba(46, 204, 113, 1)',
                             borderWidth: 2,
