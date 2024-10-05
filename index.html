@@ -225,7 +225,7 @@ ________________________________________________________________________________
     <canvas id="graficoConsumoGeracao" width="200" height="200"></canvas>
     <canvas id="graficoEconomiaMensal" width="200" height="200"></canvas>
 
-    
+    <div class="result-box" id="resultados">
         <div class="result-item">
             <i class="fas fa-coins"></i>
             <h4>Economia Estimada Anual</h4>
@@ -273,11 +273,11 @@ ________________________________________________________________________________
             limparMensagensErro();
 
             const irradiacaoDiaria = 4.55;
-            const consumo = converterParaNumero(document.getElementById('consumo').value) || 1633;
+            const consumo = converterParaNumero(document.getElementById('consumo').value);
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
             const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
             const excedente = parseFloat(document.getElementById('excedente').value) / 100;
-            const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value) || 1.17;
+            const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value);
             const eficiencia = 0.8;
 
             const pis = 0.95 / 100;
@@ -328,7 +328,7 @@ ________________________________________________________________________________
             custoComSolarMensal = Math.max(custoComSolarMensal, tarifaMinima + iluminacaoPublica);
 
             const economiaMensal = custoMensalSemSolar - custoComSolarMensal;
-            
+            const economiaAnual = economiaMensal * 12;
             document.getElementById('economia-estimada').innerText = `R$ ${economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             
             const custoTotalSistema = capacidade * 5500; // Exemplo de custo por kWp
