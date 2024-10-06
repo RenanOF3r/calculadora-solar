@@ -202,6 +202,7 @@ ________________________________________________________________________________
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
 
 <body>
@@ -382,30 +383,17 @@ ________________________________________________________________________________
                 window.consumoGeracaoChart.destroy();
             }
 
-            window.consumoGeracaoChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: meses,
-                    datasets: [
-                        {
-                            label: 'CONSUMO KWh',
-                            data: Array(12).fill(consumoMensal),
-                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1,
-                            hoverBackgroundColor: 'rgba(54, 162, 235, 0.8)',
+            window.consumoGeracaoChart = new Chart(ctx, {$1options: {
+                    plugins: {
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            formatter: Math.round,
+                            color: '#333',
+                            font: {
+                                weight: 'bold'
+                            }
                         },
-                        {
-                            label: 'GERAÇÃO KWh',
-                            data: geracaoMensal,
-                            backgroundColor: 'rgba(255, 206, 86, 0.6)',
-                            borderColor: 'rgba(255, 206, 86, 1)',
-                            borderWidth: 1,
-                            hoverBackgroundColor: 'rgba(255, 206, 86, 0.8)',
-                        }
-                    ]
-                },
-                options: {
                     responsive: true,
                     animation: {
                         duration: 1500,
@@ -447,30 +435,17 @@ ________________________________________________________________________________
                 window.economiaMensalChart.destroy();
             }
 
-            window.economiaMensalChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: meses,
-                    datasets: [
-                        {
-                            label: 'Custo Sem Solar (R$)',
-                            data: custoSemSolarMensal,
-                            backgroundColor: 'rgba(231, 76, 60, 0.7)',
-                            borderColor: 'rgba(231, 76, 60, 1)',
-                            borderWidth: 1,
-                            hoverBackgroundColor: 'rgba(231, 76, 60, 0.9)',
+            window.economiaMensalChart = new Chart(ctx, {$1options: {
+                    plugins: {
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            formatter: Math.round,
+                            color: '#333',
+                            font: {
+                                weight: 'bold'
+                            }
                         },
-                        {
-                            label: 'Custo Com Solar (R$)',
-                            data: custoComSolarMensal,
-                            backgroundColor: 'rgba(39, 174, 96, 0.7)',
-                            borderColor: 'rgba(39, 174, 96, 1)',
-                            borderWidth: 1,
-                            hoverBackgroundColor: 'rgba(39, 174, 96, 0.9)',
-                        }
-                    ]
-                },
-                options: {
                     responsive: true,
                     animation: {
                         duration: 1500,
