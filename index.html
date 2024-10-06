@@ -337,7 +337,7 @@ ________________________________________________________________________________
             const diasMes = 30;
             const producaoMensalPorKwp = irradiacaoDiaria * diasMes * eficiencia;
 
-            const capacidade = (consumo / producaoMensalPorKwp) * (cobertura + excedente);
+            const capacidade = (consumo / producaoMensalPorKwp) / (1 - cobertura + excedente);
             const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
             document.getElementById('capacidade-sistema').innerText = capacidadeFormatada;
 
@@ -371,7 +371,7 @@ ________________________________________________________________________________
             const roiTotalAnos = economiaAnual > 0 ? custoTotalSistema / economiaAnual : 0;
             const roiAnos = Math.floor(roiTotalAnos);
             const roiMeses = Math.round((roiTotalAnos % 1) * 12);
-            const roi = `${roiAnos} ${roiAnos === 1 ? 'ano' : 'anos'} e ${roiMeses} ${roiMeses === 1 ? 'mês' : 'meses'}`;
+            const roi = `${roiAnos + (roiMeses === 12 ? 1 : 0)} ${roiAnos + (roiMeses === 12 ? 1 : 0) === 1 ? 'ano' : 'anos'} e ${roiMeses % 12} ${roiMeses % 12 === 1 ? 'mês' : 'meses'}`;
             document.getElementById('roi').innerText = roi;
 
             const pr = ((energiaGerada / (capacidade * producaoMensalPorKwp * 12)) * 100).toFixed(2) + '%';
