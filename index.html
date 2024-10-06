@@ -331,6 +331,7 @@ ________________________________________________________________________________
             document.getElementById('area-total').innerText = areaFormatada;
 
             const tarifaComImpostos = tarifaSemImpostos * (1 + pis + cofins + icms);
+            const valorCreditoEnergia = tarifaSemImpostos * 0.7; // Considerando que a compensação de energia injetada na rede tem valor menor
 
             const energiaGerada = capacidade * producaoMensalPorKwp;
             const consumoImediato = energiaGerada * simultaneidade;
@@ -339,7 +340,7 @@ ________________________________________________________________________________
 
             const custoMensalSemSolar = consumo * tarifaComImpostos + iluminacaoPublica;
 
-            let custoComSolarMensal = consumoNaoCoberto * tarifaComImpostos + iluminacaoPublica;
+            let custoComSolarMensal = (consumoNaoCoberto * tarifaComImpostos) + iluminacaoPublica - (energiaInjetada * valorCreditoEnergia);
             custoComSolarMensal = Math.max(custoComSolarMensal, tarifaMinima + iluminacaoPublica);
 
             const economiaMensal = custoMensalSemSolar - custoComSolarMensal;
