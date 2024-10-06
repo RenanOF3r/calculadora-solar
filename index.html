@@ -177,9 +177,6 @@ ________________________________________________________________________________
             
             canvas {
                 max-height: 300px;
-            }
-        }
-        }
         }
 
             h1 {
@@ -201,8 +198,6 @@ ________________________________________________________________________________
             }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
 
@@ -384,7 +379,9 @@ ________________________________________________________________________________
             const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
             if (window.consumoGeracaoChart) {
-                window.consumoGeracaoChart.destroy();
+                if (window.$1) {
+                window.$1.destroy();
+            }
             }
 
             window.consumoGeracaoChart = new Chart(ctx, {
@@ -423,16 +420,8 @@ ________________________________________________________________________________
                         title: {
                             display: true,
                             text: 'Gráfico de Consumo X Geração (Em 12 Meses)'
-                        },
-                        
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'kWh/Mês'
-                            }
-                        },
+                        }
+                    },
                         x: {
                             title: {
                                 display: true,
@@ -446,7 +435,9 @@ ________________________________________________________________________________
 
         function desenharGraficoEconomiaMensal(meses, custoSemSolarMensal, custoComSolarMensal) {
             const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
-            Chart.register(ChartDataLabels);
+            if (typeof ChartDataLabels !== 'undefined') {
+                Chart.register(ChartDataLabels);
+            }
             document.getElementById('graficoEconomiaMensal').classList.add('show');
 
             if (window.economiaMensalChart) {
