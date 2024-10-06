@@ -174,10 +174,9 @@ ________________________________________________________________________________
         }
 
         @media (max-width: 768px) {
-            
-            canvas {
-                max-height: 300px;
-        }
+            .container {
+                padding: 15px;
+            }
 
             h1 {
                 font-size: 1.5rem;
@@ -196,8 +195,13 @@ ________________________________________________________________________________
             .result-box h4 {
                 font-size: 1rem;
             }
+
+            canvas {
+                max-height: 300px;
+            }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
 
@@ -238,8 +242,8 @@ ________________________________________________________________________________
         <button onclick="calcular()">Calcular</button>
     </div>
 
-    <canvas id="graficoConsumoGeracao" width="75" height="75"></canvas>
-    <canvas id="graficoEconomiaMensal" width="75" height="75"></canvas>
+    <canvas id="graficoConsumoGeracao"></canvas>
+    <canvas id="graficoEconomiaMensal"></canvas>
 
     <div class="result-box" id="resultados">
         <div class="result-item">
@@ -274,7 +278,6 @@ ________________________________________________________________________________
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         function atualizarValor(id) {
             const valor = document.getElementById(id).value;
@@ -293,14 +296,11 @@ ________________________________________________________________________________
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
             const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
             const excedente = parseFloat(document.getElementById('excedente').value) / 100;
-            const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value);
+            const tarifaComImpostos = converterParaNumero(document.getElementById('tarifa').value);
             const eficiencia = 0.8;
 
-            const pis = 0.95 / 100;
-            const cofins = 4.35 / 100;
-            const icms = 24 / 100;
             const iluminacaoPublica = 60.94;
-            const tarifaMinima = 100 * tarifaSemImpostos;
+            const tarifaMinima = 100 * tarifaComImpostos;
 
             let erro = false;
 
@@ -309,7 +309,7 @@ ________________________________________________________________________________
                 erro = true;
             }
 
-            if (isNaN(tarifaSemImpostos) || tarifaSemImpostos <= 0) {
+            if (isNaN(tarifaComImpostos) || tarifaComImpostos <= 0) {
                 mostrarErro('tarifa', 'Por favor, insira um valor válido para a tarifa.');
                 erro = true;
             }
@@ -332,8 +332,7 @@ ________________________________________________________________________________
             const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
             document.getElementById('area-total').innerText = areaFormatada;
 
-            const tarifaComImpostos = tarifaSemImpostos; // Assumindo que o valor inserido já contém os impostos
-            const valorCreditoEnergia = tarifaSemImpostos * 0.7; // Considerando que a compensação de energia injetada na rede tem valor menor
+            const valorCreditoEnergia = tarifaComImpostos * 0.7;
 
             const energiaGerada = capacidade * producaoMensalPorKwp;
             const consumoImediato = energiaGerada * simultaneidade;
@@ -349,7 +348,7 @@ ________________________________________________________________________________
             const economiaAnual = economiaMensal * 12;
             document.getElementById('economia-estimada').innerText = `R$ ${economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             
-            const custoTotalSistema = capacidade * 2500; // Exemplo de custo por kWp
+            const custoTotalSistema = capacidade * 2500;
             const roiTotalMeses = economiaAnual > 0 ? (custoTotalSistema / economiaAnual) * 12 : 0;
             const roiAnos = Math.floor(roiTotalMeses / 12);
             const roiMeses = Math.round(roiTotalMeses % 12);
@@ -371,17 +370,12 @@ ________________________________________________________________________________
 
         function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal) {
             const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
-            if (typeof ChartDataLabels !== 'undefined') {
-                
-            }
             document.getElementById('graficoConsumoGeracao').classList.add('show');
 
             const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
             if (window.consumoGeracaoChart) {
-                if (window.$1) {
-                window.$1.destroy();
-            }
+                window.consumoGeracaoChart.destroy();
             }
 
             window.consumoGeracaoChart = new Chart(ctx, {
@@ -420,8 +414,25 @@ ________________________________________________________________________________
                         title: {
                             display: true,
                             text: 'Gráfico de Consumo X Geração (Em 12 Meses)'
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            formatter: Math.round,
+                            color: '#333',
+                            font: {
+                                weight: 'bold'
+                            }
                         }
                     },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'kWh/Mês'
+                            }
+                        },
                         x: {
                             title: {
                                 display: true,
@@ -435,9 +446,6 @@ ________________________________________________________________________________
 
         function desenharGraficoEconomiaMensal(meses, custoSemSolarMensal, custoComSolarMensal) {
             const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
-            if (typeof ChartDataLabels !== 'undefined') {
-                Chart.register(ChartDataLabels);
-            }
             document.getElementById('graficoEconomiaMensal').classList.add('show');
 
             if (window.economiaMensalChart) {
