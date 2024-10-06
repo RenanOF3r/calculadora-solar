@@ -336,7 +336,7 @@ ________________________________________________________________________________
             const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
             document.getElementById('area-total').innerText = areaFormatada;
 
-            const tarifaComImpostos = tarifaSemImpostos * (1 + pis + cofins + icms);
+            // const tarifaComImpostos = tarifaSemImpostos * (1 + pis + cofins + icms);
             const valorCreditoEnergia = tarifaSemImpostos * 0.7; // Considerando que a compensação de energia injetada na rede tem valor menor
 
             const energiaGerada = capacidade * producaoMensalPorKwp;
