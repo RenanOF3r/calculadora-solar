@@ -62,7 +62,7 @@ ________________________________________________________________________________
             color: #555;
         }
 
-        input[type="text"],
+        input[type="number"],
         select,
         input[type="range"] {
             width: 100%;
@@ -72,7 +72,7 @@ ________________________________________________________________________________
             transition: border-color 0.3s;
         }
 
-        input[type="text"]:focus,
+        input[type="number"]:focus,
         select:focus,
         input[type="range"]:focus {
             border-color: #3498db;
@@ -210,7 +210,7 @@ ________________________________________________________________________________
         </div>
         <div class="input-group">
             <label for="consumo">Consumo médio mensal (kWh)</label>
-            <input type="text" id="consumo" placeholder="Digite seu consumo mensal (use vírgula para decimais)">
+            <input type="number" id="consumo" placeholder="Digite seu consumo mensal (use vírgula para decimais)">
             <span class="error-message" id="erro-consumo">Por favor, insira um valor válido para o consumo.</span>
         </div>
         <div class="input-group">
@@ -230,7 +230,7 @@ ________________________________________________________________________________
         </div>
         <div class="input-group">
             <label for="tarifa">Tarifa de Energia (R$/kWh)</label>
-            <input type="text" id="tarifa" value="1,17" placeholder="Digite a tarifa de energia (use vírgula para decimais)">
+            <input type="number" id="tarifa" value="1.17" placeholder="Digite a tarifa de energia (use vírgula para decimais)">
             <span class="error-message" id="erro-tarifa">Por favor, insira um valor válido para a tarifa.</span>
         </div>
         <button onclick="calcular()">Calcular</button>
@@ -251,14 +251,14 @@ ________________________________________________________________________________
             <p id="roi">-</p>
         </div>
         <div class="result-item">
-            <i class="fas fa-tachometer-alt"></i>
-            <h4>Índice de Performance (PR)</h4>
-            <p id="indice-performance">-</p>
-        </div>
-        <div class="result-item">
             <i class="fas fa-th"></i>
             <h4>Quantidade de Painéis</h4>
             <p id="painel-quantidade">-</p>
+        </div>
+        <div class="result-item">
+            <i class="fas fa-sun"></i>
+            <h4>Capacidade do Sistema</h4>
+            <p id="capacidade-sistema">-</p>
         </div>
         <div class="result-item">
             <i class="fas fa-ruler-combined"></i>
@@ -266,9 +266,9 @@ ________________________________________________________________________________
             <p id="area-total">-</p>
         </div>
         <div class="result-item">
-            <i class="fas fa-sun"></i>
-            <h4>Capacidade do Sistema</h4>
-            <p id="capacidade-sistema">-</p>
+            <i class="fas fa-tachometer-alt"></i>
+            <h4>Índice de Performance (PR)</h4>
+            <p id="indice-performance">-</p>
         </div>
     </div>
 
