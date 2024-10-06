@@ -293,14 +293,11 @@ ________________________________________________________________________________
             limparMensagensErro();
 
             const irradiacaoDiaria = 4.55;
-            const energiaInjetadaFatura = 403; // kWh conforme fatura
-            const consumoFatura = 100; // Consumo mensal conforme fatura em kWh
-            const tarifaComTributos = 1.11529; // Tarifa com tributos (R$/kWh)
-            const consumo = consumoFatura > 0 ? consumoFatura : converterParaNumero(document.getElementById('consumo').value);
+            const consumo = converterParaNumero(document.getElementById('consumo').value);
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
             const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
             const excedente = parseFloat(document.getElementById('excedente').value) / 100;
-            const tarifaSemImpostos = tarifaComTributos > 0 ? tarifaComTributos : converterParaNumero(document.getElementById('tarifa').value);
+            const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value);
             const eficiencia = 0.8;
 
             const pis = 0.95 / 100;
@@ -343,9 +340,8 @@ ________________________________________________________________________________
             const valorCreditoEnergia = tarifaSemImpostos * 0.7; // Considerando que a compensação de energia injetada na rede tem valor menor
 
             const energiaGerada = capacidade * producaoMensalPorKwp;
-            const energiaInjetada = energiaInjetadaFatura > 0 ? energiaInjetadaFatura : energiaGerada * (1 - simultaneidade);
             const consumoImediato = energiaGerada * simultaneidade;
-            // Energia injetada já considerada conforme fatura, caso disponível
+            const energiaInjetada = energiaGerada * (1 - simultaneidade);
             const consumoNaoCoberto = Math.max(consumo - consumoImediato, 0);
 
             const custoMensalSemSolar = consumo * tarifaComImpostos + iluminacaoPublica;
