@@ -14,20 +14,6 @@ ________________________________________________________________________________
 
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Energia Solar</title>
-</head>
-<body>
-    <h1>Bem-vindo à Calculadora da RF Energia Solar</h1>
-    <p>Em breve, você poderá calcular o tamanho ideal do sistema solar aqui!</p>
-</body>
-</html>
-______________________________________________________________________________________
-
-<!DOCTYPE html>
-<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
@@ -314,9 +300,9 @@ ________________________________________________________________________________
             const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value);
             const eficiencia = 0.8;
 
-            const pis = 0.95 / 100;
-            const cofins = 4.35 / 100;
-            const icms = 24 / 100;
+            const pis = 0.0095;
+            const cofins = 0.0435;
+            const icms = 0.24;
             const iluminacaoPublica = 60.94;
             const tarifaMinima = 100 * tarifaSemImpostos;
 
@@ -337,7 +323,7 @@ ________________________________________________________________________________
             const diasMes = 30;
             const producaoMensalPorKwp = irradiacaoDiaria * diasMes * eficiencia;
 
-            const capacidade = (consumo / producaoMensalPorKwp) / (1 - cobertura + excedente);
+            const capacidade = (consumo / producaoMensalPorKwp) * (1 + excedente);
             const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
             document.getElementById('capacidade-sistema').innerText = capacidadeFormatada;
 
