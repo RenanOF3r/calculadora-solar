@@ -334,6 +334,7 @@ ________________________________________________________________________________
 
             const energiaGerada = capacidade * producaoMensalPorKwp;
             const consumoImediato = energiaGerada * simultaneidade;
+            const energiaInjetada = energiaGerada * (1 - simultaneidade);
             const consumoNaoCoberto = Math.max(consumo - consumoImediato, 0);
 
             const custoMensalSemSolar = consumo * tarifaComImpostos + iluminacaoPublica;
