@@ -203,6 +203,7 @@ ________________________________________________________________________________
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
 
 <body>
@@ -336,7 +337,7 @@ ________________________________________________________________________________
             const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
             document.getElementById('area-total').innerText = areaFormatada;
 
-            // const tarifaComImpostos = tarifaSemImpostos * (1 + pis + cofins + icms);
+            const tarifaComImpostos = tarifaSemImpostos; // Assumindo que o valor inserido já contém os impostos
             const valorCreditoEnergia = tarifaSemImpostos * 0.7; // Considerando que a compensação de energia injetada na rede tem valor menor
 
             const energiaGerada = capacidade * producaoMensalPorKwp;
@@ -375,6 +376,7 @@ ________________________________________________________________________________
 
         function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal) {
             const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
+            Chart.register(ChartDataLabels);
             document.getElementById('graficoConsumoGeracao').classList.add('show');
 
             const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
@@ -420,16 +422,7 @@ ________________________________________________________________________________
                             display: true,
                             text: 'Gráfico de Consumo X Geração (Em 12 Meses)'
                         },
-                        datalabels: {
-                            anchor: 'end',
-                            align: 'top',
-                            formatter: Math.round,
-                            color: '#333',
-                            font: {
-                                weight: 'bold'
-                            }
-                        }
-                    },
+                        
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -451,6 +444,7 @@ ________________________________________________________________________________
 
         function desenharGraficoEconomiaMensal(meses, custoSemSolarMensal, custoComSolarMensal) {
             const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
+            Chart.register(ChartDataLabels);
             document.getElementById('graficoEconomiaMensal').classList.add('show');
 
             if (window.economiaMensalChart) {
