@@ -174,7 +174,7 @@ ________________________________________________________________________________
         }
 
         @media (max-width: 768px) {
-            $1
+            
             canvas {
                 max-height: 300px;
             }
@@ -202,7 +202,7 @@ ________________________________________________________________________________
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
 
@@ -376,7 +376,9 @@ ________________________________________________________________________________
 
         function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal) {
             const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
-            Chart.register(ChartDataLabels);
+            if (typeof ChartDataLabels !== 'undefined') {
+                
+            }
             document.getElementById('graficoConsumoGeracao').classList.add('show');
 
             const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
