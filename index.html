@@ -360,8 +360,8 @@ ________________________________________________________________________________
             const economiaAnual = economiaMensal * 12;
             document.getElementById('economia-estimada').innerText = `R$ ${economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             
-            const custoTotalSistema = capacidade * 2500; // Exemplo de custo por kWp
-            const roiTotalAnos = economiaAnual > 0 ? custoTotalSistema / economiaAnual : 0;
+            const custoTotalSistema = capacidade * 4500; // Exemplo de custo por kWp
+            const roiTotalAnos = economiaAnual > 0 ? custoTotalSistema / (economiaAnual * 1.1) : 0;
             const roiAnos = Math.floor(roiTotalAnos);
             const roiMeses = Math.round((roiTotalAnos % 1) * 12);
             const roi = `${roiAnos + Math.floor(roiMeses / 12)} ${roiAnos + Math.floor(roiMeses / 12) === 1 ? 'ano' : 'anos'} e ${roiMeses % 12} ${roiMeses % 12 === 1 ? 'mês' : 'meses'}`;
