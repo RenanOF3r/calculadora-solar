@@ -347,8 +347,9 @@ ________________________________________________________________________________
             const valorCreditoEnergia = tarifaSemImpostos * 0.7; // Considerando que a compensação de energia injetada na rede tem valor menor
 
             const energiaGerada = capacidade * producaoMensalPorKwp;
-            const consumoImediato = Math.min(consumo, energiaGerada * simultaneidade);
-            const energiaInjetada = Math.max(energiaGerada - consumoImediato, 0);
+            const consumoImediato = energiaGerada * simultaneidade;
+            
+            const energiaInjetada = energiaGerada - consumoImediato;
             const consumoNaoCoberto = Math.max(consumo - consumoImediato, 0);
 
             const custoMensalSemSolar = consumo * tarifaComImpostos + iluminacaoPublica;
