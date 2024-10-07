@@ -234,9 +234,15 @@ ________________________________________________________________________________
             <input type="range" id="excedente" value="15" max="100" min="0" step="5" oninput="atualizarValor('excedente')">
             <div class="slider-value" id="valor-excedente">Excedente: 15%</div>
         </div>
-        <div class="input-group">
-            <label for="tarifa">Tarifa de Energia (R$/kWh)</label>
-            <input type="number" id="tarifa" value="1.17" placeholder="Digite a tarifa de energia (use vírgula para decimais)">
+        $1
+            <div class="input-group">
+                <label>
+                    <input type="radio" name="tipo-tarifa" value="com-imposto" checked> Com Imposto
+                </label>
+                <label>
+                    <input type="radio" name="tipo-tarifa" value="sem-imposto"> Sem Imposto
+                </label>
+            </div>
             <span class="error-message" id="erro-tarifa">Por favor, insira um valor válido para a tarifa.</span>
         </div>
         <button onclick="calcular()">Calcular</button>
@@ -298,6 +304,8 @@ ________________________________________________________________________________
             const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
             const excedente = parseFloat(document.getElementById('excedente').value) / 100;
             const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value);
+            const tipoTarifa = document.querySelector('input[name="tipo-tarifa"]:checked').value;
+            const tarifaFinal = tipoTarifa === 'com-imposto' ? tarifaSemImpostos : tarifaSemImpostos * (1 + pis + cofins + icms);
             const eficiencia = 0.8;
 
             const pis = 0.0095;
@@ -336,7 +344,7 @@ ________________________________________________________________________________
             const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
             document.getElementById('area-total').innerText = areaFormatada;
 
-            const tarifaComImpostos = tarifaSemImpostos * (1 + pis + cofins + icms);
+            const tarifaComImpostos = tarifaFinal;
             const valorCreditoEnergia = tarifaSemImpostos * 0.7; // Considerando que a compensação de energia injetada na rede tem valor menor
 
             const energiaGerada = capacidade * producaoMensalPorKwp;
