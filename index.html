@@ -347,8 +347,8 @@ ________________________________________________________________________________
             const valorCreditoEnergia = tarifaSemImpostos * 0.7; // Considerando que a compensação de energia injetada na rede tem valor menor
 
             const energiaGerada = capacidade * producaoMensalPorKwp;
-            const consumoImediato = energiaGerada * simultaneidade;
-            const energiaInjetada = energiaGerada * (1 - simultaneidade);
+            const consumoImediato = Math.min(consumo, energiaGerada * simultaneidade);
+            const energiaInjetada = Math.max(energiaGerada - consumoImediato, 0);
             const consumoNaoCoberto = Math.max(consumo - consumoImediato, 0);
 
             const custoMensalSemSolar = consumo * tarifaComImpostos + iluminacaoPublica;
@@ -364,7 +364,7 @@ ________________________________________________________________________________
             const roiTotalAnos = economiaAnual > 0 ? custoTotalSistema / economiaAnual : 0;
             const roiAnos = Math.floor(roiTotalAnos);
             const roiMeses = Math.round((roiTotalAnos % 1) * 12);
-            const roi = `${roiAnos + (roiMeses === 12 ? 1 : 0)} ${roiAnos + (roiMeses === 12 ? 1 : 0) === 1 ? 'ano' : 'anos'} e ${roiMeses % 12} ${roiMeses % 12 === 1 ? 'mês' : 'meses'}`;
+            const roi = `${roiAnos + Math.floor(roiMeses / 12)} ${roiAnos + Math.floor(roiMeses / 12) === 1 ? 'ano' : 'anos'} e ${roiMeses % 12} ${roiMeses % 12 === 1 ? 'mês' : 'meses'}`;
             document.getElementById('roi').innerText = roi;
 
             const pr = ((energiaGerada / (capacidade * producaoMensalPorKwp * 12)) * 100).toFixed(2) + '%';
