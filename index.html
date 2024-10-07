@@ -344,17 +344,18 @@ ________________________________________________________________________________
             document.getElementById('area-total').innerText = areaFormatada;
 
             const tarifaComImpostos = tarifaFinal;
-            const valorCreditoEnergia = tarifaSemImpostos * 0.7; // Considerando que a compensação de energia injetada na rede tem valor menor
+            const valorCreditoEnergia = tarifaFinal * 0.7; // Considerando que a compensação de energia injetada na rede tem valor menor
 
             const energiaGerada = capacidade * producaoMensalPorKwp;
             const consumoImediato = energiaGerada * simultaneidade;
             
-            const energiaInjetada = energiaGerada - consumoImediato;
+            const energiaInjetada = Math.max(energiaGerada - consumoImediato, 0);
             const consumoNaoCoberto = Math.max(consumo - consumoImediato, 0);
 
             const custoMensalSemSolar = consumo * tarifaComImpostos + iluminacaoPublica;
 
             let custoComSolarMensal = (consumoNaoCoberto * tarifaComImpostos) + iluminacaoPublica - (energiaInjetada * valorCreditoEnergia);
+            custoComSolarMensal = Math.max(custoComSolarMensal, tarifaMinima + iluminacaoPublica);
             custoComSolarMensal = Math.max(custoComSolarMensal, tarifaMinima + iluminacaoPublica);
 
             const economiaMensal = custoMensalSemSolar - custoComSolarMensal;
