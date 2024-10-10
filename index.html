@@ -213,7 +213,7 @@ ________________________________________________________________________________
         <div class="input-group">
             <label for="consumo">Consumo médio mensal (kWh)</label>
             <div>
-                <label><input type="radio" name="consumo-mode" value="automatico" checked checked onclick="toggleConsumoMode('automatico')"> Automático</label>
+                <label><input type="radio" name="consumo-mode" value="automatico" checked onclick="toggleConsumoMode('automatico')"> Automático</label>
                 <label><input type="radio" name="consumo-mode" value="manual" onclick="toggleConsumoMode('manual')"> Manual</label>
             </div>
             <div id="consumo-automatico">
@@ -404,7 +404,6 @@ ________________________________________________________________________________
 
             let custoComSolarMensal = (consumoNaoCoberto * tarifaComImpostos) + iluminacaoPublica - (energiaInjetada * valorCreditoEnergia);
             custoComSolarMensal = Math.max(custoComSolarMensal, tarifaMinima + iluminacaoPublica);
-            custoComSolarMensal = Math.max(custoComSolarMensal, tarifaMinima + iluminacaoPublica);
 
             const economiaMensal = custoMensalSemSolar - custoComSolarMensal;
             const economiaAnual = economiaMensal * 12;
@@ -548,11 +547,6 @@ ________________________________________________________________________________
         function desenharGraficoEconomiaMensal(meses, custoSemSolarMensal, custoComSolarMensal) {
             const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
             document.getElementById('graficoEconomiaMensal').classList.add('show');
-            const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
-            if (!ctx) {
-                console.error('Erro ao obter contexto do gráfico de custo. Verifique se o elemento do gráfico existe e está carregado corretamente.');
-                return;
-            }
 
             if (window.economiaMensalChart) {
                 window.economiaMensalChart.destroy();
