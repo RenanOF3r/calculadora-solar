@@ -212,8 +212,31 @@ ________________________________________________________________________________
         </div>
         <div class="input-group">
             <label for="consumo">Consumo médio mensal (kWh)</label>
-            <input type="number" id="consumo" placeholder="Digite seu consumo mensal (use vírgula para decimais)">
-            <span class="error-message" id="erro-consumo">Por favor, insira um valor válido para o consumo.</span>
+            <div>
+                <label><input type="radio" name="consumo-mode" value="automatico" checked checked onclick="toggleConsumoMode('automatico')"> Automático</label>
+                <label><input type="radio" name="consumo-mode" value="manual" onclick="toggleConsumoMode('manual')"> Manual</label>
+            </div>
+            <div id="consumo-automatico">
+                <input type="number" id="consumo" placeholder="Digite seu consumo mensal (use vírgula para decimais)">
+                <span class="error-message" id="erro-consumo">Por favor, insira um valor válido para o consumo.</span>
+            </div>
+            <div id="consumo-manual" style="display: none;">
+                <label for="consumo-mensal">Insira o consumo mensal (kWh) para cada mês:</label>
+                <div id="meses-consumo">
+                    <div><label>Janeiro: <input type="number" id="consumo-jan" placeholder="kWh"></label></div>
+                    <div><label>Fevereiro: <input type="number" id="consumo-fev" placeholder="kWh"></label></div>
+                    <div><label>Março: <input type="number" id="consumo-mar" placeholder="kWh"></label></div>
+                    <div><label>Abril: <input type="number" id="consumo-abr" placeholder="kWh"></label></div>
+                    <div><label>Maio: <input type="number" id="consumo-mai" placeholder="kWh"></label></div>
+                    <div><label>Junho: <input type="number" id="consumo-jun" placeholder="kWh"></label></div>
+                    <div><label>Julho: <input type="number" id="consumo-jul" placeholder="kWh"></label></div>
+                    <div><label>Agosto: <input type="number" id="consumo-ago" placeholder="kWh"></label></div>
+                    <div><label>Setembro: <input type="number" id="consumo-set" placeholder="kWh"></label></div>
+                    <div><label>Outubro: <input type="number" id="consumo-out" placeholder="kWh"></label></div>
+                    <div><label>Novembro: <input type="number" id="consumo-nov" placeholder="kWh"></label></div>
+                    <div><label>Dezembro: <input type="number" id="consumo-dez" placeholder="kWh"></label></div>
+                </div>
+            </div>
         </div>
         <div class="input-group">
             <label for="cobertura">Cobertura desejada (%)</label>
@@ -293,11 +316,36 @@ ________________________________________________________________________________
             return parseFloat(valor.replace(",", "."));
         }
 
+        function toggleConsumoMode(mode) {
+            const consumoAutomatico = document.getElementById('consumo-automatico');
+            const consumoManual = document.getElementById('consumo-manual');
+            if (mode === 'automatico') {
+                consumoAutomatico.style.display = 'block';
+                consumoManual.style.display = 'none';
+            } else {
+                consumoAutomatico.style.display = 'none';
+                consumoManual.style.display = 'block';
+            }
+        }
+
         function calcular() {
             limparMensagensErro();
 
             const irradiacaoDiaria = 4.55;
-            const consumo = converterParaNumero(document.getElementById('consumo').value);
+            let consumo;
+            const consumoMode = document.querySelector('input[name="consumo-mode"]:checked').value;
+            if (consumoMode === 'automatico') {
+                consumo = converterParaNumero(document.getElementById('consumo').value);
+            } else {
+                consumo = 0;
+                const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+                meses.forEach(mes => {
+                    const valorMensal = converterParaNumero(document.getElementById(`consumo-${mes}`).value);
+                    if (!isNaN(valorMensal) && valorMensal > 0) {
+                        consumo += valorMensal;
+                    }
+                });
+            }
             const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
             const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
             const excedente = parseFloat(document.getElementById('excedente').value) / 100;
@@ -372,9 +420,14 @@ ________________________________________________________________________________
             const pr = ((energiaGerada / (capacidade * producaoMensalPorKwp * 12)) * 100).toFixed(2) + '%';
             document.getElementById('indice-performance').innerText = pr;
 
-            const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
             const mesesArray = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-            const geracaoMensal = sazonalidade.map(fator => producaoMensalPorKwp * capacidade * fator);
+            let geracaoMensal;
+            if (consumoMode === 'automatico') {
+                const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
+                geracaoMensal = sazonalidade.map(fator => producaoMensalPorKwp * capacidade * fator);
+            } else {
+                geracaoMensal = Array(12).fill(producaoMensalPorKwp * capacidade);
+            }
             desenharGraficoConsumoGeracao(consumo, geracaoMensal);
 
             const custoComSolarMensalArray = sazonalidade.map(fator => Math.max(custoComSolarMensal * fator, tarifaMinima + iluminacaoPublica));
