@@ -430,8 +430,20 @@ ________________________________________________________________________________
             }
             desenharGraficoConsumoGeracao(consumo, geracaoMensal);
 
-            const custoComSolarMensalArray = sazonalidade.map(fator => Math.max(custoComSolarMensal * fator, tarifaMinima + iluminacaoPublica));
-            const custoSemSolarMensalArray = sazonalidade.map(fator => custoMensalSemSolar * fator);
+            let custoComSolarMensalArray;
+            if (consumoMode === 'automatico') {
+                const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
+                custoComSolarMensalArray = sazonalidade.map(fator => Math.max(custoComSolarMensal * fator, tarifaMinima + iluminacaoPublica));
+            } else {
+                custoComSolarMensalArray = Array(12).fill(custoComSolarMensal);
+            }
+            let custoSemSolarMensalArray;
+            if (consumoMode === 'automatico') {
+                const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
+                custoSemSolarMensalArray = sazonalidade.map(fator => custoMensalSemSolar * fator);
+            } else {
+                custoSemSolarMensalArray = Array(12).fill(custoMensalSemSolar);
+            }
             desenharGraficoEconomiaMensal(mesesArray, custoSemSolarMensalArray, custoComSolarMensalArray);
         }
 
@@ -536,6 +548,11 @@ ________________________________________________________________________________
         function desenharGraficoEconomiaMensal(meses, custoSemSolarMensal, custoComSolarMensal) {
             const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
             document.getElementById('graficoEconomiaMensal').classList.add('show');
+            const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
+            if (!ctx) {
+                console.error('Erro ao obter contexto do gráfico de custo. Verifique se o elemento do gráfico existe e está carregado corretamente.');
+                return;
+            }
 
             if (window.economiaMensalChart) {
                 window.economiaMensalChart.destroy();
