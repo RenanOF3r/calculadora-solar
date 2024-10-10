@@ -412,6 +412,15 @@ ________________________________________________________________________________
                             borderColor: 'rgba(255, 206, 86, 1)',
                             borderWidth: 1,
                             hoverBackgroundColor: 'rgba(255, 206, 86, 0.8)',
+                        },
+                        {
+                            label: 'Média Consumo e Geração',
+                            data: Array(12).fill((consumoMensal + geracaoMensal.reduce((a, b) => a + b, 0) / 12) / 2),
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            type: 'line',
+                            fill: false
                         }
                     ]
                 },
@@ -486,6 +495,15 @@ ________________________________________________________________________________
                             borderColor: 'rgba(39, 174, 96, 1)',
                             borderWidth: 1,
                             hoverBackgroundColor: 'rgba(39, 174, 96, 0.9)',
+                        },
+                        {
+                            label: 'Média Custo Mensal',
+                            data: Array(12).fill((custoSemSolarMensal.reduce((a, b) => a + b, 0) / 12 + custoComSolarMensal.reduce((a, b) => a + b, 0) / 12) / 2),
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            type: 'line',
+                            fill: false
                         }
                     ]
                 },
