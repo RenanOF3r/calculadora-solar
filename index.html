@@ -4,21 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Energia Solar</title>
-</head>
-<body>
-    <h1>Bem-vindo à Calculadora da RF Energia Solar</h1>
-    <p>Em breve, você poderá calcular o tamanho ideal do sistema solar aqui!</p>
-</body>
-</html>
-______________________________________________________________________________________
-
-<!DOCTYPE html>
-<html lang="pt-BR">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Solar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -196,12 +181,36 @@ ________________________________________________________________________________
         .result-box h4 {
             font-size: 1rem;
         }
+
+        /* Estilo opcional para seção de boas-vindas */
+        #boasVindas {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #boasVindas p {
+            font-size: 1rem;
+            color: #666;
+        }
+        /* Ocultar o slider de cobertura */
+        #cobertura,
+        #valor-cobertura {
+            display: none;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
 
 <body>
+    <!-- Seção de Boas-Vindas -->
+    <div id="boasVindas">
+        <h1>Bem-vindo à Calculadora da RF Energia Solar</h1>
+        <p>Em breve, você poderá calcular o tamanho ideal do sistema solar aqui!</p>
+    </div>
+
+    <hr>
+
+    <!-- Seção principal da Calculadora -->
     <h1>Calculadora Solar</h1>
     <div class="container">
         <div class="input-group">
@@ -238,11 +247,11 @@ ________________________________________________________________________________
                 </div>
             </div>
         </div>
-        <div class="input-group">
-            <label for="cobertura">Cobertura desejada (%)</label>
-            <input type="range" id="cobertura" value="100" max="100" min="0" oninput="atualizarValor('cobertura')">
-            <div class="slider-value" id="valor-cobertura">100%</div>
-        </div>
+
+        <!-- Cobertura (removidos slider e label, mantido hidden por CSS) -->
+        <input type="range" id="cobertura" value="100" max="100" min="0">
+        <div class="slider-value" id="valor-cobertura">100%</div>
+        
         <div class="input-group">
             <label for="simultaneidade">Simultaneidade do Consumo (%)</label>
             <input type="range" id="simultaneidade" value="70" max="100" min="0" oninput="atualizarValor('simultaneidade')">
@@ -298,14 +307,10 @@ ________________________________________________________________________________
             <h4>Área Total Necessária</h4>
             <p id="area-total">-</p>
         </div>
-        <div class="result-item">
-            <i class="fas fa-tachometer-alt"></i>
-            <h4>Índice de Performance (PR)</h4>
-            <p id="indice-performance">-</p>
-        </div>
+        
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Scripts JS -->
     <script>
         function atualizarValor(id) {
             const valor = document.getElementById(id).value;
@@ -328,58 +333,104 @@ ________________________________________________________________________________
             }
         }
 
+        function mostrarErro(id, mensagem) {
+            const erroElemento = document.getElementById(`erro-${id}`);
+            erroElemento.innerText = mensagem;
+            erroElemento.classList.add('show');
+        }
+
+        function limparMensagensErro() {
+            const mensagensErro = document.querySelectorAll('.error-message');
+            mensagensErro.forEach(mensagem => mensagem.classList.remove('show'));
+        }
+
+        // Ajustamos os fatores de sazonalidade para o modo automático.
+        const sazonalidadePadrao = [
+            1.22, // Jan
+            1.08, // Fev
+            1.09, // Mar
+            0.96, // Abr
+            0.90, // Mai
+            0.78, // Jun
+            0.83, // Jul
+            0.90, // Ago
+            0.98, // Set
+            1.01, // Out
+            1.06, // Nov
+            1.17  // Dez
+        ];
+
         function calcular() {
             limparMensagensErro();
 
             const irradiacaoDiaria = 4.55;
-            let consumo;
-            const consumoMode = document.querySelector('input[name="consumo-mode"]:checked').value;
-            if (consumoMode === 'automatico') {
-                consumo = converterParaNumero(document.getElementById('consumo').value);
-            } else {
-                consumo = 0;
-                const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-                meses.forEach(mes => {
-                    const valorMensal = converterParaNumero(document.getElementById(`consumo-${mes}`).value);
-                    if (!isNaN(valorMensal) && valorMensal > 0) {
-                        consumo += valorMensal;
-                    }
-                });
-            }
-            const cobertura = parseFloat(document.getElementById('cobertura').value) / 100;
-            const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
-            const excedente = parseFloat(document.getElementById('excedente').value) / 100;
-            const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value);
-            const tipoTarifa = document.querySelector('input[name="tipo-tarifa"]:checked').value;
             const eficiencia = 0.8;
 
+            // Arrays para consumo e geração mensais.
+            let consumoMensal = new Array(12).fill(0);
+            let consumoTotal = 0;
+
+            const consumoMode = document.querySelector('input[name="consumo-mode"]:checked').value;
+            if (consumoMode === 'automatico') {
+                // Modo automático
+                const consumoMedio = converterParaNumero(document.getElementById('consumo').value);
+
+                if (isNaN(consumoMedio) || consumoMedio <= 0) {
+                    mostrarErro('consumo', 'Por favor, insira um valor válido para o consumo.');
+                    return;
+                }
+
+                for (let i = 0; i < 12; i++) {
+                    consumoMensal[i] = consumoMedio * sazonalidadePadrao[i];
+                }
+
+            } else {
+                // Modo manual
+                const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+                for (let i = 0; i < 12; i++) {
+                    const valorMensal = converterParaNumero(
+                        document.getElementById(`consumo-${meses[i]}`).value
+                    );
+                    if (!isNaN(valorMensal) && valorMensal > 0) {
+                        consumoMensal[i] = valorMensal;
+                    } else {
+                        consumoMensal[i] = 0;
+                    }
+                }
+            }
+
+            consumoTotal = consumoMensal.reduce((acc, val) => acc + val, 0);
+
+            const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value);
+            if (isNaN(tarifaSemImpostos) || tarifaSemImpostos <= 0) {
+                mostrarErro('tarifa', 'Por favor, insira um valor válido para a tarifa.');
+                return;
+            }
+
+            const tipoTarifa = document.querySelector('input[name="tipo-tarifa"]:checked').value;
             const pis = 0.0095;
             const cofins = 0.0435;
             const icms = 0.24;
-            const iluminacaoPublica = 60.94;
-            const tarifaMinima = 100 * tarifaSemImpostos;
 
-            let erro = false;
+            const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
+            const excedente = parseFloat(document.getElementById('excedente').value) / 100;
 
-            if (isNaN(consumo) || consumo <= 0) {
-                mostrarErro('consumo', 'Por favor, insira um valor válido para o consumo.');
-                erro = true;
-            }
+            // Removemos iluminacaoPublica e tarifaMinima.
 
-            if (isNaN(tarifaSemImpostos) || tarifaSemImpostos <= 0) {
-                mostrarErro('tarifa', 'Por favor, insira um valor válido para a tarifa.');
-                erro = true;
-            }
-
-            if (erro) return;
-
-            const tarifaFinal = tipoTarifa === 'com-imposto' ? tarifaSemImpostos : tarifaSemImpostos * (1 + pis + cofins + icms);
+            // Aplica ou não os impostos.
+            const tarifaFinal = (tipoTarifa === 'com-imposto')
+                ? tarifaSemImpostos
+                : tarifaSemImpostos * (1 + pis + cofins + icms);
 
             const diasMes = 30;
             const producaoMensalPorKwp = irradiacaoDiaria * diasMes * eficiencia;
 
-            const capacidade = (consumo / producaoMensalPorKwp) * (1 + excedente);
-            const capacidadeFormatada = capacidade.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kWp";
+            // Dimensiona a capacidade.
+            const capacidade = (consumoTotal / producaoMensalPorKwp) * (1 + excedente);
+            const capacidadeFormatada = capacidade.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + " kWp";
             document.getElementById('capacidade-sistema').innerText = capacidadeFormatada;
 
             const capacidadePorPainel = 0.55;
@@ -388,65 +439,70 @@ ________________________________________________________________________________
 
             const areaPorPainel = 1.134 * 2.278;
             const areaTotal = numeroDePaineis * areaPorPainel;
-            const areaFormatada = areaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " m²";
+            const areaFormatada = areaTotal.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + " m²";
             document.getElementById('area-total').innerText = areaFormatada;
 
-            const tarifaComImpostos = tarifaFinal;
-            const valorCreditoEnergia = tarifaFinal * 0.7; // Considerando que a compensação de energia injetada na rede tem valor menor
+            // Geração mensal.
+            let geracaoMensal = new Array(12).fill(0);
+            for (let i = 0; i < 12; i++) {
+                geracaoMensal[i] = capacidade * producaoMensalPorKwp * sazonalidadePadrao[i];
+            }
 
-            const energiaGerada = capacidade * producaoMensalPorKwp;
-            const consumoImediato = energiaGerada * simultaneidade;
-            
-            const energiaInjetada = Math.max(energiaGerada - consumoImediato, 0);
-            const consumoNaoCoberto = Math.max(consumo - consumoImediato, 0);
+            let custoSemSolarMensal = new Array(12).fill(0);
+            let custoComSolarMensal = new Array(12).fill(0);
 
-            const custoMensalSemSolar = consumo * tarifaComImpostos + iluminacaoPublica;
+            const valorCreditoEnergia = tarifaFinal * 0.7; // Exemplo
 
-            let custoComSolarMensal = (consumoNaoCoberto * tarifaComImpostos) + iluminacaoPublica - (energiaInjetada * valorCreditoEnergia);
-            custoComSolarMensal = Math.max(custoComSolarMensal, tarifaMinima + iluminacaoPublica);
+            for (let i = 0; i < 12; i++) {
+                // custo sem solar
+                custoSemSolarMensal[i] = consumoMensal[i] * tarifaFinal;
 
-            const economiaMensal = custoMensalSemSolar - custoComSolarMensal;
-            const economiaAnual = economiaMensal * 12;
-            document.getElementById('economia-estimada').innerText = `R$ ${economiaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            
-            const custoTotalSistema = capacidade * 2500; // Exemplo de custo por kWp
+                // consumo e injeção
+                const energiaImediata = geracaoMensal[i] * simultaneidade;
+                const injecao = Math.max(geracaoMensal[i] - energiaImediata, 0);
+                const consumoNaoCoberto = Math.max(consumoMensal[i] - energiaImediata, 0);
+
+                let custoSolar = (consumoNaoCoberto * tarifaFinal) - (injecao * valorCreditoEnergia);
+
+                // Sem tarifa mínima ou iluminação pública.
+                // Ajuste se quiser um custo mínimo.
+                if (custoSolar < 0) {
+                    custoSolar = 0;
+                }
+
+                custoComSolarMensal[i] = custoSolar;
+            }
+
+            // Economia.
+            let economiaMensalArray = new Array(12).fill(0);
+            for (let i = 0; i < 12; i++) {
+                economiaMensalArray[i] = custoSemSolarMensal[i] - custoComSolarMensal[i];
+            }
+            const economiaAnual = economiaMensalArray.reduce((acc, val) => acc + val, 0);
+
+            document.getElementById('economia-estimada').innerText = `R$ ${economiaAnual.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })}`;
+
+            // ROI.
+            const custoTotalSistema = capacidade * 2500;
             const roiTotalAnos = economiaAnual > 0 ? custoTotalSistema / economiaAnual : 0;
             const roiAnos = Math.floor(roiTotalAnos);
             const roiMeses = Math.round((roiTotalAnos % 1) * 12);
-            const roi = `${roiAnos + Math.floor(roiMeses / 12)} ${roiAnos + Math.floor(roiMeses / 12) === 1 ? 'ano' : 'anos'} e ${roiMeses % 12} ${roiMeses % 12 === 1 ? 'mês' : 'meses'}`;
-            document.getElementById('roi').innerText = roi;
+            const roiTexto = `${roiAnos + Math.floor(roiMeses / 12)} ` +
+                `${(roiAnos + Math.floor(roiMeses / 12) === 1 ? 'ano' : 'anos')} e ${roiMeses % 12} ` +
+                `${(roiMeses % 12 === 1 ? 'mês' : 'meses')}`;
+            document.getElementById('roi').innerText = roiTexto;
 
-            const pr = ((energiaGerada / (capacidade * producaoMensalPorKwp * 12)) * 100).toFixed(2) + '%';
-            document.getElementById('indice-performance').innerText = pr;
-
-            const mesesArray = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-            let geracaoMensal;
-            if (consumoMode === 'automatico') {
-                const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
-                geracaoMensal = sazonalidade.map(fator => producaoMensalPorKwp * capacidade * fator);
-            } else {
-                geracaoMensal = Array(12).fill(producaoMensalPorKwp * capacidade);
-            }
-            desenharGraficoConsumoGeracao(consumo, geracaoMensal);
-
-            let custoComSolarMensalArray;
-            if (consumoMode === 'automatico') {
-                const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
-                custoComSolarMensalArray = sazonalidade.map(fator => Math.max(custoComSolarMensal * fator, tarifaMinima + iluminacaoPublica));
-            } else {
-                custoComSolarMensalArray = Array(12).fill(custoComSolarMensal);
-            }
-            let custoSemSolarMensalArray;
-            if (consumoMode === 'automatico') {
-                const sazonalidade = [1.10, 1.15, 1.05, 0.95, 0.85, 0.80, 0.85, 0.95, 1.05, 1.20, 1.15, 1.10];
-                custoSemSolarMensalArray = sazonalidade.map(fator => custoMensalSemSolar * fator);
-            } else {
-                custoSemSolarMensalArray = Array(12).fill(custoMensalSemSolar);
-            }
-            desenharGraficoEconomiaMensal(mesesArray, custoSemSolarMensalArray, custoComSolarMensalArray);
+            desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal);
+            desenharGraficoEconomiaMensal(custoSemSolarMensal, custoComSolarMensal);
         }
 
-        function desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal) {
+        function desenharGraficoConsumoGeracao(consumoArray, geracaoArray) {
             const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
             document.getElementById('graficoConsumoGeracao').classList.add('show');
 
@@ -462,42 +518,20 @@ ________________________________________________________________________________
                     labels: meses,
                     datasets: [
                         {
-                            label: 'CONSUMO KWh',
-                            data: Array(12).fill(consumoMensal),
+                            label: 'CONSUMO (kWh)',
+                            data: consumoArray,
                             backgroundColor: 'rgba(54, 162, 235, 0.6)',
                             borderColor: 'rgba(54, 162, 235, 1)',
                             borderWidth: 1,
                             hoverBackgroundColor: 'rgba(54, 162, 235, 0.8)',
                         },
                         {
-                            label: 'GERAÇÃO KWh',
-                            data: geracaoMensal,
+                            label: 'GERAÇÃO (kWh)',
+                            data: geracaoArray,
                             backgroundColor: 'rgba(255, 206, 86, 0.6)',
                             borderColor: 'rgba(255, 206, 86, 1)',
                             borderWidth: 1,
                             hoverBackgroundColor: 'rgba(255, 206, 86, 0.8)',
-                        },
-                        {
-                            label: 'Média Consumo',
-                            data: Array(12).fill(Number(consumoMensal.toFixed(1))),
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            type: 'line',
-                            fill: false,
-                            pointRadius: 3,
-                            pointBackgroundColor: 'rgba(75, 192, 192, 1)'
-                        },
-                        {
-                            label: 'Média Geração',
-                            data: Array(12).fill(Number((geracaoMensal.reduce((a, b) => a + b, 0) / 12).toFixed(1))),
-                            borderColor: 'rgba(255, 159, 64, 1)',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            type: 'line',
-                            fill: false,
-                            pointRadius: 3,
-                            pointBackgroundColor: 'rgba(255, 159, 64, 1)'
                         }
                     ]
                 },
@@ -513,12 +547,12 @@ ________________________________________________________________________________
                         },
                         title: {
                             display: true,
-                            text: 'Gráfico de Consumo X Geração (Em 12 Meses)'
+                            text: 'Gráfico de Consumo X Geração (Mensal)'
                         },
                         datalabels: {
                             anchor: 'end',
                             align: 'top',
-                            formatter: Math.round,
+                            formatter: value => Math.round(value),
                             color: '#333',
                             font: {
                                 weight: 'bold'
@@ -544,9 +578,11 @@ ________________________________________________________________________________
             });
         }
 
-        function desenharGraficoEconomiaMensal(meses, custoSemSolarMensal, custoComSolarMensal) {
+        function desenharGraficoEconomiaMensal(custoSemSolarArray, custoComSolarArray) {
             const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
             document.getElementById('graficoEconomiaMensal').classList.add('show');
+
+            const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
             if (window.economiaMensalChart) {
                 window.economiaMensalChart.destroy();
@@ -559,7 +595,7 @@ ________________________________________________________________________________
                     datasets: [
                         {
                             label: 'Custo Sem Solar (R$)',
-                            data: custoSemSolarMensal,
+                            data: custoSemSolarArray,
                             backgroundColor: 'rgba(231, 76, 60, 0.7)',
                             borderColor: 'rgba(231, 76, 60, 1)',
                             borderWidth: 1,
@@ -567,33 +603,11 @@ ________________________________________________________________________________
                         },
                         {
                             label: 'Custo Com Solar (R$)',
-                            data: custoComSolarMensal,
+                            data: custoComSolarArray,
                             backgroundColor: 'rgba(39, 174, 96, 0.7)',
                             borderColor: 'rgba(39, 174, 96, 1)',
                             borderWidth: 1,
                             hoverBackgroundColor: 'rgba(39, 174, 96, 0.9)',
-                        },
-                        {
-                            label: 'Média Custo Sem Solar',
-                            data: Array(12).fill(Number((custoSemSolarMensal.reduce((a, b) => a + b, 0) / 12).toFixed(2))),
-                            borderColor: 'rgba(231, 76, 60, 1)',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            type: 'line',
-                            fill: false,
-                            pointRadius: 3,
-                            pointBackgroundColor: 'rgba(231, 76, 60, 1)'
-                        },
-                        {
-                            label: 'Média Custo Com Solar',
-                            data: Array(12).fill(Number((custoComSolarMensal.reduce((a, b) => a + b, 0) / 12).toFixed(2))),
-                            borderColor: 'rgba(39, 174, 96, 1)',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            type: 'line',
-                            fill: false,
-                            pointRadius: 3,
-                            pointBackgroundColor: 'rgba(39, 174, 96, 1)'
                         }
                     ]
                 },
@@ -609,12 +623,12 @@ ________________________________________________________________________________
                         },
                         title: {
                             display: true,
-                            text: 'Comparação de Custos Mensais Com e Sem Energia Solar (1º Ano)'
+                            text: 'Comparação de Custos Mensais (1º Ano)'
                         },
                         datalabels: {
                             anchor: 'end',
                             align: 'top',
-                            formatter: Math.round,
+                            formatter: value => value.toFixed(2),
                             color: '#333',
                             font: {
                                 weight: 'bold'
@@ -639,18 +653,7 @@ ________________________________________________________________________________
                 }
             });
         }
-
-        function mostrarErro(id, mensagem) {
-            const erroElemento = document.getElementById(`erro-${id}`);
-            erroElemento.innerText = mensagem;
-            erroElemento.classList.add('show');
-        }
-
-        function limparMensagensErro() {
-            const mensagensErro = document.querySelectorAll('.error-message');
-            mensagensErro.forEach(mensagem => mensagem.classList.remove('show'));
-        }
     </script>
 </body>
-
 </html>
+
