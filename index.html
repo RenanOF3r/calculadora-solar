@@ -1,659 +1,674 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Energia Solar</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-            color: #333;
-        }
-
-        h1 {
-            color: #f39c12;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2rem;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            position: relative;
-        }
-
-        label {
-            font-weight: bold;
-            color: #555;
-        }
-
-        input[type="number"],
-        select,
-        input[type="range"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            transition: border-color 0.3s;
-        }
-
-        input[type="number"]:focus,
-        select:focus,
-        input[type="range"]:focus {
-            border-color: #3498db;
-        }
-
-        .slider-value {
-            text-align: right;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .result-box {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-            background-color: #f7f9fc;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-        }
-
-        .result-box .result-item {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-            position: relative;
-        }
-
-        .result-box .result-item:hover {
-            transform: scale(1.05);
-        }
-
-        .result-box h4 {
-            color: #3498db;
-            margin-bottom: 10px;
-            font-size: 1.2rem;
-        }
-
-        .result-box p {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .result-box i {
-            font-size: 2rem;
-            color: #f39c12;
-            margin-bottom: 10px;
-        }
-
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-            display: block;
-            margin: 20px auto;
-            width: 100%;
-            max-width: 200px;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        canvas {
-            margin-top: 30px;
-            width: 100%;
-            height: auto;
-            max-height: 400px;
-            transition: opacity 1s ease-in-out, transform 1s ease;
-            opacity: 0;
-            transform: scale(0.9);
-        }
-
-        canvas.show {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .error-message {
-            color: red;
-            display: none;
-            font-size: 0.9rem;
-            margin-top: 5px;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            canvas {
-                max-height: 300px;
-            }
-        }
-
-        h1 {
-            font-size: 1.5rem;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 0.9rem;
-            max-width: 150px;
-        }
-
-        .result-box p {
-            font-size: 1.2rem;
-        }
-
-        .result-box h4 {
-            font-size: 1rem;
-        }
-
-        /* Estilo opcional para seção de boas-vindas */
-        #boasVindas {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        #boasVindas p {
-            font-size: 1rem;
-            color: #666;
-        }
-        /* Ocultar o slider de cobertura */
-        #cobertura,
-        #valor-cobertura {
-            display: none;
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora da RF Energia Solar</title>
+  <!-- Font Awesome para ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- CSS embutido -->
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+      color: #333;
+    }
+    header, main, footer {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    header h1 {
+      color: #f39c12;
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    main h2 {
+      color: #3498db;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .container {
+      background-color: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+    }
+    label {
+      font-weight: bold;
+      color: #555;
+    }
+    input[type="number"],
+    select,
+    input[type="range"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      transition: border-color 0.3s;
+    }
+    input[type="number"]:focus,
+    select:focus,
+    input[type="range"]:focus {
+      border-color: #3498db;
+    }
+    .slider-value {
+      text-align: right;
+      font-weight: bold;
+      color: #333;
+    }
+    .result-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+      background-color: #f7f9fc;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+    }
+    .result-box .result-item {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+    .result-box .result-item:hover {
+      transform: scale(1.05);
+    }
+    .result-box h4 {
+      color: #3498db;
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+    }
+    .result-box p {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .result-box i {
+      font-size: 2rem;
+      color: #f39c12;
+      margin-bottom: 10px;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+      display: block;
+      margin: 20px auto;
+      width: 100%;
+      max-width: 200px;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    canvas {
+      margin-top: 30px;
+      width: 100%;
+      height: auto;
+      max-height: 400px;
+      transition: opacity 1s ease-in-out, transform 1s ease;
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    canvas.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .error-message {
+      color: red;
+      display: none;
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
+    .error-message.show {
+      display: block;
+    }
+    @media (max-width: 768px) {
+      canvas {
+        max-height: 300px;
+      }
+    }
+    /* Ajustes para dispositivos móveis */
+    header h1 {
+      font-size: 1.8rem;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      max-width: 150px;
+    }
+    .result-box p {
+      font-size: 1.2rem;
+    }
+    .result-box h4 {
+      font-size: 1rem;
+    }
+    /* Seção de Boas-Vindas */
+    #boasVindas p {
+      font-size: 1rem;
+      color: #666;
+    }
+    /* Ocultar elementos não utilizados */
+    #cobertura,
+    #valor-cobertura {
+      display: none;
+    }
+  </style>
+  <!-- Bibliotecas para os gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
-
 <body>
-    <!-- Seção de Boas-Vindas -->
-    <div id="boasVindas">
-        <h1>Bem-vindo à Calculadora da RF Energia Solar</h1>
-        <p>Em breve, você poderá calcular o tamanho ideal do sistema solar aqui!</p>
-    </div>
+  <!-- Cabeçalho -->
+  <header id="boasVindas">
+    <h1>Calculadora da RF Energia Solar</h1>
+    <p>Bem-vindo à nossa ferramenta para calcular o tamanho ideal do sistema solar!</p>
+  </header>
 
-    <hr>
+  <hr>
 
-    <!-- Seção principal da Calculadora -->
-    <h1>Calculadora Solar</h1>
-    <div class="container">
+  <!-- Conteúdo Principal -->
+  <main>
+    <!-- Seção da Calculadora -->
+    <section id="calculadora">
+      <h2>Calculadora Solar</h2>
+      <div class="container">
         <div class="input-group">
-            <label for="cidade">Cidade</label>
-            <select id="cidade" disabled>
-                <option value="4.55" selected>Rio de Janeiro (RJ)</option>
-            </select>
+          <label for="cidade">Cidade</label>
+          <!-- O value representa a irradiância diária para a cidade -->
+          <select id="cidade">
+            <option value="4.55" selected>Rio de Janeiro (RJ)</option>
+            <!-- Futuramente, outras cidades podem ser adicionadas aqui -->
+          </select>
         </div>
         <div class="input-group">
-            <label for="consumo">Consumo médio mensal (kWh)</label>
-            <div>
-                <label><input type="radio" name="consumo-mode" value="automatico" checked onclick="toggleConsumoMode('automatico')"> Automático</label>
-                <label><input type="radio" name="consumo-mode" value="manual" onclick="toggleConsumoMode('manual')"> Manual</label>
+          <label for="consumo">Consumo médio mensal (kWh)</label>
+          <div>
+            <label>
+              <input type="radio" name="consumo-mode" value="automatico" checked onclick="toggleConsumoMode('automatico')">
+              Automático
+            </label>
+            <label>
+              <input type="radio" name="consumo-mode" value="manual" onclick="toggleConsumoMode('manual')">
+              Manual
+            </label>
+          </div>
+          <div id="consumo-automatico">
+            <input type="number" id="consumo" placeholder="Digite seu consumo mensal (use vírgula para decimais)">
+            <span class="error-message" id="erro-consumo">Por favor, insira um valor válido para o consumo.</span>
+          </div>
+          <div id="consumo-manual" style="display: none;">
+            <label for="consumo-mensal">Insira o consumo mensal (kWh) para cada mês:</label>
+            <div id="meses-consumo">
+              <div><label>Janeiro: <input type="number" id="consumo-jan" placeholder="kWh"></label></div>
+              <div><label>Fevereiro: <input type="number" id="consumo-fev" placeholder="kWh"></label></div>
+              <div><label>Março: <input type="number" id="consumo-mar" placeholder="kWh"></label></div>
+              <div><label>Abril: <input type="number" id="consumo-abr" placeholder="kWh"></label></div>
+              <div><label>Maio: <input type="number" id="consumo-mai" placeholder="kWh"></label></div>
+              <div><label>Junho: <input type="number" id="consumo-jun" placeholder="kWh"></label></div>
+              <div><label>Julho: <input type="number" id="consumo-jul" placeholder="kWh"></label></div>
+              <div><label>Agosto: <input type="number" id="consumo-ago" placeholder="kWh"></label></div>
+              <div><label>Setembro: <input type="number" id="consumo-set" placeholder="kWh"></label></div>
+              <div><label>Outubro: <input type="number" id="consumo-out" placeholder="kWh"></label></div>
+              <div><label>Novembro: <input type="number" id="consumo-nov" placeholder="kWh"></label></div>
+              <div><label>Dezembro: <input type="number" id="consumo-dez" placeholder="kWh"></label></div>
             </div>
-            <div id="consumo-automatico">
-                <input type="number" id="consumo" placeholder="Digite seu consumo mensal (use vírgula para decimais)">
-                <span class="error-message" id="erro-consumo">Por favor, insira um valor válido para o consumo.</span>
-            </div>
-            <div id="consumo-manual" style="display: none;">
-                <label for="consumo-mensal">Insira o consumo mensal (kWh) para cada mês:</label>
-                <div id="meses-consumo">
-                    <div><label>Janeiro: <input type="number" id="consumo-jan" placeholder="kWh"></label></div>
-                    <div><label>Fevereiro: <input type="number" id="consumo-fev" placeholder="kWh"></label></div>
-                    <div><label>Março: <input type="number" id="consumo-mar" placeholder="kWh"></label></div>
-                    <div><label>Abril: <input type="number" id="consumo-abr" placeholder="kWh"></label></div>
-                    <div><label>Maio: <input type="number" id="consumo-mai" placeholder="kWh"></label></div>
-                    <div><label>Junho: <input type="number" id="consumo-jun" placeholder="kWh"></label></div>
-                    <div><label>Julho: <input type="number" id="consumo-jul" placeholder="kWh"></label></div>
-                    <div><label>Agosto: <input type="number" id="consumo-ago" placeholder="kWh"></label></div>
-                    <div><label>Setembro: <input type="number" id="consumo-set" placeholder="kWh"></label></div>
-                    <div><label>Outubro: <input type="number" id="consumo-out" placeholder="kWh"></label></div>
-                    <div><label>Novembro: <input type="number" id="consumo-nov" placeholder="kWh"></label></div>
-                    <div><label>Dezembro: <input type="number" id="consumo-dez" placeholder="kWh"></label></div>
-                </div>
-            </div>
+          </div>
         </div>
 
-        <!-- Cobertura (removidos slider e label, mantido hidden por CSS) -->
+        <!-- Slider de Cobertura (oculto) -->
         <input type="range" id="cobertura" value="100" max="100" min="0">
         <div class="slider-value" id="valor-cobertura">100%</div>
         
         <div class="input-group">
-            <label for="simultaneidade">Simultaneidade do Consumo (%)</label>
-            <input type="range" id="simultaneidade" value="70" max="100" min="0" oninput="atualizarValor('simultaneidade')">
-            <div class="slider-value" id="valor-simultaneidade">70%</div>
+          <label for="simultaneidade">Simultaneidade do Consumo (%)</label>
+          <input type="range" id="simultaneidade" value="70" max="100" min="0" oninput="atualizarValor('simultaneidade')">
+          <div class="slider-value" id="valor-simultaneidade">70%</div>
         </div>
         <div class="input-group">
-            <label for="excedente">Excedente Desejado (%)</label>
-            <input type="range" id="excedente" value="15" max="100" min="0" step="5" oninput="atualizarValor('excedente')">
-            <div class="slider-value" id="valor-excedente">Excedente: 15%</div>
+          <label for="excedente">Excedente Desejado (%)</label>
+          <input type="range" id="excedente" value="15" max="100" min="0" step="5" oninput="atualizarValor('excedente')">
+          <div class="slider-value" id="valor-excedente">Excedente: 15%</div>
         </div>
         <div class="input-group">
-            <label for="tarifa">Tarifa de Energia (R$/kWh)</label>
-            <input type="number" id="tarifa" placeholder="Digite a tarifa de energia (use vírgula para decimais)">
-            <div class="input-group">
-                <label>
-                    <input type="radio" name="tipo-tarifa" value="com-imposto" checked> Com Imposto
-                </label>
-                <label>
-                    <input type="radio" name="tipo-tarifa" value="sem-imposto"> Sem Imposto
-                </label>
-            </div>
-            <span class="error-message" id="erro-tarifa">Por favor, insira um valor válido para a tarifa.</span>
+          <label for="tarifa">Tarifa de Energia (R$/kWh)</label>
+          <input type="number" id="tarifa" placeholder="Digite a tarifa de energia (use vírgula para decimais)">
+          <div class="input-group">
+            <label>
+              <input type="radio" name="tipo-tarifa" value="com-imposto" checked> Com Imposto
+            </label>
+            <label>
+              <input type="radio" name="tipo-tarifa" value="sem-imposto"> Sem Imposto
+            </label>
+          </div>
+          <span class="error-message" id="erro-tarifa">Por favor, insira um valor válido para a tarifa.</span>
         </div>
         <button onclick="calcular()">Calcular</button>
-    </div>
+      </div>
+    </section>
 
-    <canvas id="graficoConsumoGeracao" width="75" height="75"></canvas>
-    <canvas id="graficoEconomiaMensal" width="75" height="75"></canvas>
+    <!-- Seção dos Gráficos -->
+    <section id="graficos">
+      <canvas id="graficoConsumoGeracao" width="75" height="75"></canvas>
+      <canvas id="graficoEconomiaMensal" width="75" height="75"></canvas>
+    </section>
 
-    <div class="result-box" id="resultados">
+    <!-- Seção de Resultados -->
+    <section id="resultados-section">
+      <div class="result-box" id="resultados">
         <div class="result-item">
-            <i class="fas fa-coins"></i>
-            <h4>Economia Estimada Anual</h4>
-            <p id="economia-estimada">-</p>
+          <i class="fas fa-coins"></i>
+          <h4>Economia Estimada Anual</h4>
+          <p id="economia-estimada">-</p>
         </div>
         <div class="result-item">
-            <i class="fas fa-chart-line"></i>
-            <h4>Retorno Sobre Investimento (ROI)</h4>
-            <p id="roi">-</p>
+          <i class="fas fa-chart-line"></i>
+          <h4>Retorno Sobre Investimento (ROI)</h4>
+          <p id="roi">-</p>
         </div>
         <div class="result-item">
-            <i class="fas fa-th"></i>
-            <h4>Quantidade de Painéis</h4>
-            <p id="painel-quantidade">-</p>
+          <i class="fas fa-th"></i>
+          <h4>Quantidade de Painéis</h4>
+          <p id="painel-quantidade">-</p>
         </div>
         <div class="result-item">
-            <i class="fas fa-sun"></i>
-            <h4>Capacidade do Sistema</h4>
-            <p id="capacidade-sistema">-</p>
+          <i class="fas fa-sun"></i>
+          <h4>Capacidade do Sistema</h4>
+          <p id="capacidade-sistema">-</p>
         </div>
         <div class="result-item">
-            <i class="fas fa-ruler-combined"></i>
-            <h4>Área Total Necessária</h4>
-            <p id="area-total">-</p>
+          <i class="fas fa-ruler-combined"></i>
+          <h4>Área Total Necessária</h4>
+          <p id="area-total">-</p>
         </div>
-        
-    </div>
+      </div>
+    </section>
+  </main>
 
-    <!-- Scripts JS -->
-    <script>
-        function atualizarValor(id) {
-            const valor = document.getElementById(id).value;
-            document.getElementById(`valor-${id}`).innerText = `${valor}%`;
+  <!-- Rodapé -->
+  <footer>
+    <p>&copy; 2025 RF Energia Solar. Todos os direitos reservados.</p>
+  </footer>
+
+  <!-- JavaScript embutido -->
+  <script>
+    // Atualiza o valor exibido dos inputs range
+    function atualizarValor(id) {
+      const valor = document.getElementById(id).value;
+      document.getElementById(`valor-${id}`).innerText = `${valor}%`;
+    }
+
+    // Converte uma string para número, tratando vírgula como separador decimal
+    function converterParaNumero(valor) {
+      return parseFloat(valor.replace(",", "."));
+    }
+
+    // Alterna entre o modo de consumo automático e manual
+    function toggleConsumoMode(mode) {
+      const consumoAutomatico = document.getElementById('consumo-automatico');
+      const consumoManual = document.getElementById('consumo-manual');
+      if (mode === 'automatico') {
+        consumoAutomatico.style.display = 'block';
+        consumoManual.style.display = 'none';
+      } else {
+        consumoAutomatico.style.display = 'none';
+        consumoManual.style.display = 'block';
+      }
+    }
+
+    // Exibe mensagens de erro abaixo dos inputs
+    function mostrarErro(id, mensagem) {
+      const erroElemento = document.getElementById(`erro-${id}`);
+      erroElemento.innerText = mensagem;
+      erroElemento.classList.add('show');
+    }
+
+    // Remove todas as mensagens de erro
+    function limparMensagensErro() {
+      const mensagensErro = document.querySelectorAll('.error-message');
+      mensagensErro.forEach(mensagem => mensagem.classList.remove('show'));
+    }
+
+    // Fator de sazonalidade para cada mês (valores fixos de exemplo)
+    const sazonalidadePadrao = [
+      1.22, // Janeiro
+      1.08, // Fevereiro
+      1.09, // Março
+      0.96, // Abril
+      0.90, // Maio
+      0.78, // Junho
+      0.83, // Julho
+      0.90, // Agosto
+      0.98, // Setembro
+      1.01, // Outubro
+      1.06, // Novembro
+      1.17  // Dezembro
+    ];
+
+    // Função principal para realizar os cálculos e atualizar a interface
+    function calcular() {
+      limparMensagensErro();
+
+      // Obter o valor de irradiância a partir do select de cidade
+      const cidadeSelect = document.getElementById('cidade');
+      const irradiacaoDiaria = parseFloat(cidadeSelect.value) || 4.55;
+
+      // Eficiência do sistema (valor padrão; pode ser parametrizado futuramente)
+      const eficiencia = 0.8;
+
+      // Inicializa os arrays de consumo mensal e o consumo total
+      let consumoMensal = new Array(12).fill(0);
+      let consumoTotal = 0;
+
+      const consumoMode = document.querySelector('input[name="consumo-mode"]:checked').value;
+      if (consumoMode === 'automatico') {
+        // Modo automático: utiliza um consumo médio ajustado pela sazonalidade
+        const consumoMedio = converterParaNumero(document.getElementById('consumo').value);
+
+        if (isNaN(consumoMedio) || consumoMedio <= 0) {
+          mostrarErro('consumo', 'Por favor, insira um valor válido para o consumo.');
+          return;
         }
 
-        function converterParaNumero(valor) {
-            return parseFloat(valor.replace(",", "."));
+        for (let i = 0; i < 12; i++) {
+          consumoMensal[i] = consumoMedio * sazonalidadePadrao[i];
+        }
+      } else {
+        // Modo manual: coleta o consumo para cada mês individualmente
+        const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+        for (let i = 0; i < 12; i++) {
+          const valorMensal = converterParaNumero(
+            document.getElementById(`consumo-${meses[i]}`).value
+          );
+          if (!isNaN(valorMensal) && valorMensal > 0) {
+            consumoMensal[i] = valorMensal;
+          } else {
+            consumoMensal[i] = 0;
+          }
+        }
+      }
+
+      consumoTotal = consumoMensal.reduce((acc, val) => acc + val, 0);
+
+      // Processamento da tarifa de energia
+      const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value);
+      if (isNaN(tarifaSemImpostos) || tarifaSemImpostos <= 0) {
+        mostrarErro('tarifa', 'Por favor, insira um valor válido para a tarifa.');
+        return;
+      }
+
+      const tipoTarifa = document.querySelector('input[name="tipo-tarifa"]:checked').value;
+      const pis = 0.0095;
+      const cofins = 0.0435;
+      const icms = 0.24;
+
+      const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
+      const excedente = parseFloat(document.getElementById('excedente').value) / 100;
+
+      // Aplica ou não os impostos à tarifa
+      const tarifaFinal = (tipoTarifa === 'com-imposto')
+        ? tarifaSemImpostos
+        : tarifaSemImpostos * (1 + pis + cofins + icms);
+
+      const diasMes = 30;
+      const producaoMensalPorKwp = irradiacaoDiaria * diasMes * eficiencia;
+
+      // Dimensionamento da capacidade do sistema
+      const capacidade = (consumoTotal / producaoMensalPorKwp) * (1 + excedente);
+      const capacidadeFormatada = capacidade.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " kWp";
+      document.getElementById('capacidade-sistema').innerText = capacidadeFormatada;
+
+      const capacidadePorPainel = 0.55; // Cada painel possui, por exemplo, 0.55 kWp.
+      const numeroDePaineis = Math.ceil(capacidade / capacidadePorPainel);
+      document.getElementById('painel-quantidade').innerText = `${numeroDePaineis} painéis de 550W`;
+
+      const areaPorPainel = 1.134 * 2.278;
+      const areaTotal = numeroDePaineis * areaPorPainel;
+      const areaFormatada = areaTotal.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " m²";
+      document.getElementById('area-total').innerText = areaFormatada;
+
+      // Cálculo da geração mensal (ajustada pela sazonalidade)
+      let geracaoMensal = new Array(12).fill(0);
+      for (let i = 0; i < 12; i++) {
+        geracaoMensal[i] = capacidade * producaoMensalPorKwp * sazonalidadePadrao[i];
+      }
+
+      let custoSemSolarMensal = new Array(12).fill(0);
+      let custoComSolarMensal = new Array(12).fill(0);
+
+      // Valor de crédito para energia injetada (parâmetro exemplificativo)
+      const valorCreditoEnergia = tarifaFinal * 0.7;
+
+      for (let i = 0; i < 12; i++) {
+        // Custo sem sistema solar
+        custoSemSolarMensal[i] = consumoMensal[i] * tarifaFinal;
+
+        // Energia consumida imediatamente e energia injetada na rede
+        const energiaImediata = geracaoMensal[i] * simultaneidade;
+        const injecao = Math.max(geracaoMensal[i] - energiaImediata, 0);
+        const consumoNaoCoberto = Math.max(consumoMensal[i] - energiaImediata, 0);
+
+        let custoSolar = (consumoNaoCoberto * tarifaFinal) - (injecao * valorCreditoEnergia);
+
+        // Se o custo for negativo, considera-o como zero.
+        if (custoSolar < 0) {
+          custoSolar = 0;
         }
 
-        function toggleConsumoMode(mode) {
-            const consumoAutomatico = document.getElementById('consumo-automatico');
-            const consumoManual = document.getElementById('consumo-manual');
-            if (mode === 'automatico') {
-                consumoAutomatico.style.display = 'block';
-                consumoManual.style.display = 'none';
-            } else {
-                consumoAutomatico.style.display = 'none';
-                consumoManual.style.display = 'block';
+        custoComSolarMensal[i] = custoSolar;
+      }
+
+      // Cálculo da economia anual
+      let economiaMensalArray = new Array(12).fill(0);
+      for (let i = 0; i < 12; i++) {
+        economiaMensalArray[i] = custoSemSolarMensal[i] - custoComSolarMensal[i];
+      }
+      const economiaAnual = economiaMensalArray.reduce((acc, val) => acc + val, 0);
+
+      document.getElementById('economia-estimada').innerText = `R$ ${economiaAnual.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })}`;
+
+      // Cálculo do Retorno Sobre Investimento (ROI)
+      const custoTotalSistema = capacidade * 2500; // Custo total do sistema (valor aproximado)
+      const roiTotalAnos = economiaAnual > 0 ? custoTotalSistema / economiaAnual : 0;
+      const roiAnos = Math.floor(roiTotalAnos);
+      const roiMeses = Math.round((roiTotalAnos % 1) * 12);
+      const roiTexto = `${roiAnos + Math.floor(roiMeses / 12)} ${((roiAnos + Math.floor(roiMeses / 12)) === 1 ? 'ano' : 'anos')} e ${roiMeses % 12} ${(roiMeses % 12 === 1 ? 'mês' : 'meses')}`;
+      document.getElementById('roi').innerText = roiTexto;
+
+      // Desenhar os gráficos (funções de renderização dos gráficos abaixo)
+      desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal);
+      desenharGraficoEconomiaMensal(custoSemSolarMensal, custoComSolarMensal);
+    }
+
+    // Função para desenhar o gráfico de Consumo x Geração mensal
+    function desenharGraficoConsumoGeracao(consumoArray, geracaoArray) {
+      const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
+      document.getElementById('graficoConsumoGeracao').classList.add('show');
+
+      const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+      if (window.consumoGeracaoChart) {
+        window.consumoGeracaoChart.destroy();
+      }
+
+      window.consumoGeracaoChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: meses,
+          datasets: [
+            {
+              label: 'CONSUMO (kWh)',
+              data: consumoArray,
+              backgroundColor: 'rgba(54, 162, 235, 0.6)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1,
+              hoverBackgroundColor: 'rgba(54, 162, 235, 0.8)'
+            },
+            {
+              label: 'GERAÇÃO (kWh)',
+              data: geracaoArray,
+              backgroundColor: 'rgba(255, 206, 86, 0.6)',
+              borderColor: 'rgba(255, 206, 86, 1)',
+              borderWidth: 1,
+              hoverBackgroundColor: 'rgba(255, 206, 86, 0.8)'
             }
+          ]
+        },
+        options: {
+          responsive: true,
+          animation: {
+            duration: 1500,
+            easing: 'easeOutBounce'
+          },
+          plugins: {
+            legend: {
+              position: 'top'
+            },
+            title: {
+              display: true,
+              text: 'Gráfico de Consumo x Geração (Mensal)'
+            },
+            datalabels: {
+              anchor: 'end',
+              align: 'top',
+              formatter: value => Math.round(value),
+              color: '#333',
+              font: {
+                weight: 'bold'
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'kWh/Mês'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Meses'
+              }
+            }
+          }
         }
+      });
+    }
 
-        function mostrarErro(id, mensagem) {
-            const erroElemento = document.getElementById(`erro-${id}`);
-            erroElemento.innerText = mensagem;
-            erroElemento.classList.add('show');
+    // Função para desenhar o gráfico de Economia Mensal (Custo sem Solar x Custo com Solar)
+    function desenharGraficoEconomiaMensal(custoSemSolarArray, custoComSolarArray) {
+      const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
+      document.getElementById('graficoEconomiaMensal').classList.add('show');
+
+      const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+      if (window.economiaMensalChart) {
+        window.economiaMensalChart.destroy();
+      }
+
+      window.economiaMensalChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: meses,
+          datasets: [
+            {
+              label: 'Custo Sem Solar (R$)',
+              data: custoSemSolarArray,
+              backgroundColor: 'rgba(231, 76, 60, 0.7)',
+              borderColor: 'rgba(231, 76, 60, 1)',
+              borderWidth: 1,
+              hoverBackgroundColor: 'rgba(231, 76, 60, 0.9)'
+            },
+            {
+              label: 'Custo Com Solar (R$)',
+              data: custoComSolarArray,
+              backgroundColor: 'rgba(39, 174, 96, 0.7)',
+              borderColor: 'rgba(39, 174, 96, 1)',
+              borderWidth: 1,
+              hoverBackgroundColor: 'rgba(39, 174, 96, 0.9)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          animation: {
+            duration: 1500,
+            easing: 'easeOutBounce'
+          },
+          plugins: {
+            legend: {
+              position: 'top'
+            },
+            title: {
+              display: true,
+              text: 'Comparação de Custos Mensais (1º Ano)'
+            },
+            datalabels: {
+              anchor: 'end',
+              align: 'top',
+              formatter: value => value.toFixed(2),
+              color: '#333',
+              font: {
+                weight: 'bold'
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Custo Mensal (R$)'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Meses'
+              }
+            }
+          }
         }
-
-        function limparMensagensErro() {
-            const mensagensErro = document.querySelectorAll('.error-message');
-            mensagensErro.forEach(mensagem => mensagem.classList.remove('show'));
-        }
-
-        // Ajustamos os fatores de sazonalidade para o modo automático.
-        const sazonalidadePadrao = [
-            1.22, // Jan
-            1.08, // Fev
-            1.09, // Mar
-            0.96, // Abr
-            0.90, // Mai
-            0.78, // Jun
-            0.83, // Jul
-            0.90, // Ago
-            0.98, // Set
-            1.01, // Out
-            1.06, // Nov
-            1.17  // Dez
-        ];
-
-        function calcular() {
-            limparMensagensErro();
-
-            const irradiacaoDiaria = 4.55;
-            const eficiencia = 0.8;
-
-            // Arrays para consumo e geração mensais.
-            let consumoMensal = new Array(12).fill(0);
-            let consumoTotal = 0;
-
-            const consumoMode = document.querySelector('input[name="consumo-mode"]:checked').value;
-            if (consumoMode === 'automatico') {
-                // Modo automático
-                const consumoMedio = converterParaNumero(document.getElementById('consumo').value);
-
-                if (isNaN(consumoMedio) || consumoMedio <= 0) {
-                    mostrarErro('consumo', 'Por favor, insira um valor válido para o consumo.');
-                    return;
-                }
-
-                for (let i = 0; i < 12; i++) {
-                    consumoMensal[i] = consumoMedio * sazonalidadePadrao[i];
-                }
-
-            } else {
-                // Modo manual
-                const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-                for (let i = 0; i < 12; i++) {
-                    const valorMensal = converterParaNumero(
-                        document.getElementById(`consumo-${meses[i]}`).value
-                    );
-                    if (!isNaN(valorMensal) && valorMensal > 0) {
-                        consumoMensal[i] = valorMensal;
-                    } else {
-                        consumoMensal[i] = 0;
-                    }
-                }
-            }
-
-            consumoTotal = consumoMensal.reduce((acc, val) => acc + val, 0);
-
-            const tarifaSemImpostos = converterParaNumero(document.getElementById('tarifa').value);
-            if (isNaN(tarifaSemImpostos) || tarifaSemImpostos <= 0) {
-                mostrarErro('tarifa', 'Por favor, insira um valor válido para a tarifa.');
-                return;
-            }
-
-            const tipoTarifa = document.querySelector('input[name="tipo-tarifa"]:checked').value;
-            const pis = 0.0095;
-            const cofins = 0.0435;
-            const icms = 0.24;
-
-            const simultaneidade = parseFloat(document.getElementById('simultaneidade').value) / 100;
-            const excedente = parseFloat(document.getElementById('excedente').value) / 100;
-
-            // Removemos iluminacaoPublica e tarifaMinima.
-
-            // Aplica ou não os impostos.
-            const tarifaFinal = (tipoTarifa === 'com-imposto')
-                ? tarifaSemImpostos
-                : tarifaSemImpostos * (1 + pis + cofins + icms);
-
-            const diasMes = 30;
-            const producaoMensalPorKwp = irradiacaoDiaria * diasMes * eficiencia;
-
-            // Dimensiona a capacidade.
-            const capacidade = (consumoTotal / producaoMensalPorKwp) * (1 + excedente);
-            const capacidadeFormatada = capacidade.toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }) + " kWp";
-            document.getElementById('capacidade-sistema').innerText = capacidadeFormatada;
-
-            const capacidadePorPainel = 0.55;
-            const numeroDePaineis = Math.ceil(capacidade / capacidadePorPainel);
-            document.getElementById('painel-quantidade').innerText = `${numeroDePaineis} painéis de 550W`;
-
-            const areaPorPainel = 1.134 * 2.278;
-            const areaTotal = numeroDePaineis * areaPorPainel;
-            const areaFormatada = areaTotal.toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }) + " m²";
-            document.getElementById('area-total').innerText = areaFormatada;
-
-            // Geração mensal.
-            let geracaoMensal = new Array(12).fill(0);
-            for (let i = 0; i < 12; i++) {
-                geracaoMensal[i] = capacidade * producaoMensalPorKwp * sazonalidadePadrao[i];
-            }
-
-            let custoSemSolarMensal = new Array(12).fill(0);
-            let custoComSolarMensal = new Array(12).fill(0);
-
-            const valorCreditoEnergia = tarifaFinal * 0.7; // Exemplo
-
-            for (let i = 0; i < 12; i++) {
-                // custo sem solar
-                custoSemSolarMensal[i] = consumoMensal[i] * tarifaFinal;
-
-                // consumo e injeção
-                const energiaImediata = geracaoMensal[i] * simultaneidade;
-                const injecao = Math.max(geracaoMensal[i] - energiaImediata, 0);
-                const consumoNaoCoberto = Math.max(consumoMensal[i] - energiaImediata, 0);
-
-                let custoSolar = (consumoNaoCoberto * tarifaFinal) - (injecao * valorCreditoEnergia);
-
-                // Sem tarifa mínima ou iluminação pública.
-                // Ajuste se quiser um custo mínimo.
-                if (custoSolar < 0) {
-                    custoSolar = 0;
-                }
-
-                custoComSolarMensal[i] = custoSolar;
-            }
-
-            // Economia.
-            let economiaMensalArray = new Array(12).fill(0);
-            for (let i = 0; i < 12; i++) {
-                economiaMensalArray[i] = custoSemSolarMensal[i] - custoComSolarMensal[i];
-            }
-            const economiaAnual = economiaMensalArray.reduce((acc, val) => acc + val, 0);
-
-            document.getElementById('economia-estimada').innerText = `R$ ${economiaAnual.toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            })}`;
-
-            // ROI.
-            const custoTotalSistema = capacidade * 2500;
-            const roiTotalAnos = economiaAnual > 0 ? custoTotalSistema / economiaAnual : 0;
-            const roiAnos = Math.floor(roiTotalAnos);
-            const roiMeses = Math.round((roiTotalAnos % 1) * 12);
-            const roiTexto = `${roiAnos + Math.floor(roiMeses / 12)} ` +
-                `${(roiAnos + Math.floor(roiMeses / 12) === 1 ? 'ano' : 'anos')} e ${roiMeses % 12} ` +
-                `${(roiMeses % 12 === 1 ? 'mês' : 'meses')}`;
-            document.getElementById('roi').innerText = roiTexto;
-
-            desenharGraficoConsumoGeracao(consumoMensal, geracaoMensal);
-            desenharGraficoEconomiaMensal(custoSemSolarMensal, custoComSolarMensal);
-        }
-
-        function desenharGraficoConsumoGeracao(consumoArray, geracaoArray) {
-            const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
-            document.getElementById('graficoConsumoGeracao').classList.add('show');
-
-            const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-
-            if (window.consumoGeracaoChart) {
-                window.consumoGeracaoChart.destroy();
-            }
-
-            window.consumoGeracaoChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: meses,
-                    datasets: [
-                        {
-                            label: 'CONSUMO (kWh)',
-                            data: consumoArray,
-                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1,
-                            hoverBackgroundColor: 'rgba(54, 162, 235, 0.8)',
-                        },
-                        {
-                            label: 'GERAÇÃO (kWh)',
-                            data: geracaoArray,
-                            backgroundColor: 'rgba(255, 206, 86, 0.6)',
-                            borderColor: 'rgba(255, 206, 86, 1)',
-                            borderWidth: 1,
-                            hoverBackgroundColor: 'rgba(255, 206, 86, 0.8)',
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    animation: {
-                        duration: 1500,
-                        easing: 'easeOutBounce'
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Gráfico de Consumo X Geração (Mensal)'
-                        },
-                        datalabels: {
-                            anchor: 'end',
-                            align: 'top',
-                            formatter: value => Math.round(value),
-                            color: '#333',
-                            font: {
-                                weight: 'bold'
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'kWh/Mês'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Meses'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function desenharGraficoEconomiaMensal(custoSemSolarArray, custoComSolarArray) {
-            const ctx = document.getElementById('graficoEconomiaMensal').getContext('2d');
-            document.getElementById('graficoEconomiaMensal').classList.add('show');
-
-            const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-
-            if (window.economiaMensalChart) {
-                window.economiaMensalChart.destroy();
-            }
-
-            window.economiaMensalChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: meses,
-                    datasets: [
-                        {
-                            label: 'Custo Sem Solar (R$)',
-                            data: custoSemSolarArray,
-                            backgroundColor: 'rgba(231, 76, 60, 0.7)',
-                            borderColor: 'rgba(231, 76, 60, 1)',
-                            borderWidth: 1,
-                            hoverBackgroundColor: 'rgba(231, 76, 60, 0.9)',
-                        },
-                        {
-                            label: 'Custo Com Solar (R$)',
-                            data: custoComSolarArray,
-                            backgroundColor: 'rgba(39, 174, 96, 0.7)',
-                            borderColor: 'rgba(39, 174, 96, 1)',
-                            borderWidth: 1,
-                            hoverBackgroundColor: 'rgba(39, 174, 96, 0.9)',
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    animation: {
-                        duration: 1500,
-                        easing: 'easeOutBounce'
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Comparação de Custos Mensais (1º Ano)'
-                        },
-                        datalabels: {
-                            anchor: 'end',
-                            align: 'top',
-                            formatter: value => value.toFixed(2),
-                            color: '#333',
-                            font: {
-                                weight: 'bold'
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Custo Mensal (R$)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Meses'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    </script>
+      });
+    }
+  </script>
 </body>
 </html>
-
