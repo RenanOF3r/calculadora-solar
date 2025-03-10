@@ -10,13 +10,19 @@ const CONSUMO_MINIMO_KWH = 100;
 const CUSTO_FIXO_ILUMINACAO = 60.94;
 const PERCENTUAL_CREDITO = 0.7; // Percentual de desconto no crédito da energia excedente
 
+// Índices de sazonalidade para o consumo no RJ
+const indicesSazonalidadeConsumo = [1.04, 1.03, 0.98, 0.99, 0.97, 0.96, 0.98, 1.01, 1.02, 1.03, 1.05, 1.02];
+
+// Fatores de correção para a geração solar no RJ
+const fatoresCorrecaoGeracao = [1.08, 1.07, 1.05, 1.02, 0.97, 0.95, 0.94, 0.96, 0.98, 1.03, 1.06, 1.07];
+
 function calcular() {
   limparMensagensErro();
 
-  const consumo = converterParaNumero(document.getElementById('consumo').value);
+  const consumoBase = converterParaNumero(document.getElementById('consumo').value);
   const tarifa = converterParaNumero(document.getElementById('tarifa').value);
 
-  if (isNaN(consumo) || consumo <= 0) {
+  if (isNaN(consumoBase) || consumoBase <= 0) {
     mostrarErro('consumo', 'Por favor, insira um valor válido.');
     return;
   }
@@ -25,32 +31,24 @@ function calcular() {
     return;
   }
 
-  // Energia gerada supõe que 100% do consumo é coberto pelo sistema
-  const energiaGerada = consumo;
+  // Aplicar a sazonalidade ao consumo
+  const consumoMensal = indicesSazonalidadeConsumo.map(indice => consumoBase * indice);
   
-  // Cálculo da energia excedente
-  const energiaExcedente = Math.max(energiaGerada - consumo, 0);
-  const valorCredito = energiaExcedente * tarifa * PERCENTUAL_CREDITO;
+  // Aplicar a sazonalidade à geração de energia
+  const geracaoMensal = consumoMensal.map((consumo, mes) => consumo * fatoresCorrecaoGeracao[mes]);
 
-  // Cálculo do custo mensal com energia solar
-  let custoComSolar = Math.max((CONSUMO_MINIMO_KWH * tarifa) + CUSTO_FIXO_ILUMINACAO - valorCredito, CONSUMO_MINIMO_KWH * tarifa + CUSTO_FIXO_ILUMINACAO);
-  
-  // Cálculo do custo sem energia solar
-  const custoSemSolar = (consumo * tarifa) + CUSTO_FIXO_ILUMINACAO;
+  // Cálculo dos custos sem energia solar
+  const custoSemSolar = consumoMensal.map(consumo => (consumo * tarifa) + CUSTO_FIXO_ILUMINACAO);
 
-  // Economia mensal e anual
-  const economiaMensal = custoSemSolar - custoComSolar;
-  const economiaAnual = economiaMensal * 12;
+  // Cálculo dos custos com energia solar e créditos
+  const custoComSolar = geracaoMensal.map((geracao, mes) => {
+    const energiaExcedente = Math.max(geracao - consumoMensal[mes], 0);
+    const valorCredito = energiaExcedente * tarifa * PERCENTUAL_CREDITO;
+    return Math.max((CONSUMO_MINIMO_KWH * tarifa) + CUSTO_FIXO_ILUMINACAO - valorCredito, (CONSUMO_MINIMO_KWH * tarifa) + CUSTO_FIXO_ILUMINACAO);
+  });
 
-  // Criar arrays para os meses
-  const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-  
-  // Criar arrays para custo com e sem solar
-  const custoSemSolarArray = Array(12).fill(custoSemSolar);
-  const custoComSolarArray = Array(12).fill(custoComSolar);
-
-  // Atualizar o gráfico
-  desenharGrafico(consumo, custoSemSolarArray, custoComSolarArray);
+  // Atualizar gráfico com os dados corrigidos
+  desenharGrafico(consumoMensal, custoSemSolar, custoComSolar);
 }
 
 function mostrarErro(id, mensagem) {
@@ -64,13 +62,10 @@ function limparMensagensErro() {
   mensagensErro.forEach(mensagem => mensagem.style.display = 'none');
 }
 
-function desenharGrafico(consumo, custoSemSolar, custoComSolar) {
+function desenharGrafico(consumoMensal, custoSemSolar, custoComSolar) {
   const ctx = document.getElementById('graficoConsumoGeracao').getContext('2d');
-  
-  // Definir os meses do ano
   const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
-  // Destruir gráfico anterior para evitar sobreposição
   if (window.consumoGeracaoChart) {
     window.consumoGeracaoChart.destroy();
   }
@@ -82,7 +77,7 @@ function desenharGrafico(consumo, custoSemSolar, custoComSolar) {
       datasets: [
         {
           label: 'Consumo (kWh)',
-          data: Array(12).fill(consumo),
+          data: consumoMensal,
           backgroundColor: 'rgba(54, 162, 235, 0.6)',
           borderColor: 'rgba(54, 162, 235, 1)',
           borderWidth: 1
@@ -107,7 +102,7 @@ function desenharGrafico(consumo, custoSemSolar, custoComSolar) {
       responsive: true,
       plugins: {
         legend: { position: 'top' },
-        title: { display: true, text: 'Comparação de Consumo e Custos Mensais' }
+        title: { display: true, text: 'Comparação de Consumo e Custos Mensais com Sazonalidade' }
       },
       scales: {
         y: { beginAtZero: true, title: { display: true, text: 'Valor (R$) / Consumo (kWh)' } },
