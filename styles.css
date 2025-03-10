@@ -1,5 +1,5 @@
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: Arial, sans-serif;
   background-color: #f0f2f5;
   margin: 0;
   padding: 20px;
@@ -7,19 +7,17 @@ body {
 }
 
 h1 {
-  color: #f39c12;
   text-align: center;
-  margin-bottom: 30px;
-  font-size: 2rem;
+  color: #f39c12;
 }
 
 .container {
-  max-width: 900px;
-  margin: 0 auto;
-  background-color: #fff;
-  padding: 25px;
+  max-width: 500px;
+  margin: 20px auto;
+  background: white;
+  padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .input-group {
@@ -28,36 +26,33 @@ h1 {
 
 label {
   font-weight: bold;
-  color: #555;
 }
 
-input[type="number"] {
+input {
   width: 100%;
   padding: 10px;
+  margin-top: 5px;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
 
 button {
-  background-color: #3498db;
+  background: #3498db;
   color: white;
   border: none;
-  padding: 12px 25px;
+  padding: 10px;
+  width: 100%;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1rem;
-  display: block;
-  margin: 20px auto;
-  max-width: 200px;
 }
 
 button:hover {
-  background-color: #2980b9;
+  background: #2980b9;
 }
 
-canvas {
-  margin-top: 30px;
-  width: 100%;
-  height: auto;
-  max-height: 400px;
+.error-message {
+  color: red;
+  font-size: 0.9rem;
+  display: none;
 }
+
