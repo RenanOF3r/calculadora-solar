@@ -8,14 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const resultado = document.getElementById('resultado-calculo');
   const graficosContainer = document.getElementById('graficos-resultado-container');
 
-  const dadosCidades = {
-    RJ: [{ nome: 'Rio de Janeiro', hsp: 4.55 }, { nome: 'Niterói', hsp: 4.6 }],
-    SP: [{ nome: 'São Paulo', hsp: 4.7 }, { nome: 'Campinas', hsp: 4.85 }],
-    MG: [{ nome: 'Belo Horizonte', hsp: 5.1 }],
-    BA: [{ nome: 'Salvador', hsp: 5.4 }],
-    CE: [{ nome: 'Fortaleza', hsp: 5.9 }]
-  };
-
   const elementos = {
     investimento: document.getElementById('resultado-investimento'),
     economiaMes: document.getElementById('resultado-economia-mes'),
@@ -29,6 +21,14 @@ document.addEventListener('DOMContentLoaded', () => {
     geracaoAnual: document.getElementById('resultado-geracao-anual'),
     area: document.getElementById('resultado-area'),
     peso: document.getElementById('resultado-peso')
+  };
+
+  const dadosCidades = {
+    RJ: [{ nome: 'Rio de Janeiro', hsp: 4.55 }, { nome: 'Niterói', hsp: 4.6 }],
+    SP: [{ nome: 'São Paulo', hsp: 4.7 }, { nome: 'Campinas', hsp: 4.85 }],
+    MG: [{ nome: 'Belo Horizonte', hsp: 5.1 }],
+    BA: [{ nome: 'Salvador', hsp: 5.4 }],
+    CE: [{ nome: 'Fortaleza', hsp: 5.9 }]
   };
 
   let grafico1, grafico2, grafico3;
@@ -71,17 +71,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const economiaAnual = economiaMensal * 12;
     const economiaTotal = economiaAnual * 25;
     const investimento = potenciaKWp * 1000 * 3.5;
-    const payback = investimento / economiaAnual;
+    const paybackAnos = investimento / economiaAnual;
+
+    const paybackAnosInt = Math.floor(paybackAnos);
+    const paybackMeses = Math.round((paybackAnos - paybackAnosInt) * 12);
+    const paybackTexto = `${paybackAnosInt} ano${paybackAnosInt !== 1 ? 's' : ''} e ${paybackMeses} mês${paybackMeses !== 1 ? 'es' : ''}`;
 
     const co2 = geracaoAnual * 0.075;
     const arvores = (co2 / 1000) * 7;
     const kmCarro = geracaoAnual * 5;
 
-    // Preencher resultados
+    // Atualizar os resultados
     elementos.investimento.textContent = formatarMoeda(investimento);
     elementos.economiaMes.textContent = formatarMoeda(economiaMensal);
     elementos.economiaTotal.textContent = formatarMoeda(economiaTotal);
-    elementos.payback.textContent = `${payback.toFixed(1)} anos`;
+    elementos.payback.textContent = paybackTexto;
     elementos.co2.textContent = `${co2.toFixed(0)} kg`;
     elementos.arvores.textContent = `${arvores.toFixed(0)} árvores`;
     elementos.kmCarro.textContent = `${kmCarro.toFixed(0)} km`;
@@ -94,34 +98,45 @@ document.addEventListener('DOMContentLoaded', () => {
     resultado.classList.remove('hidden');
     graficosContainer.classList.remove('hidden');
 
-    // Gráficos
-    criarGraficoConsumo(consumoMensal * 12, geracaoAnual);
+    criarGraficoConsumoMensal(consumoMensal, geracaoMensal);
     criarGraficoPizza(consumoMensal, geracaoMensal);
-    criarGraficoPayback(investimento, economiaAnual, payback);
+    criarGraficoPayback(investimento, economiaAnual);
   });
 
   function formatarMoeda(valor) {
     return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   }
 
-  function criarGraficoConsumo(semFV, comFV) {
+  function criarGraficoConsumoMensal(consumo, geracao) {
     if (grafico1) grafico1.destroy();
     const ctx = document.getElementById('graficoConsumoComparativo').getContext('2d');
+    const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const variacao = [0.95, 0.97, 1, 1.03, 1.05, 1.08, 1.1, 1.05, 1, 0.98, 0.96, 0.94];
+
+    const consumoMensal = variacao.map(v => consumo * v);
+    const geracaoMensal = variacao.map(v => geracao * v);
+
     grafico1 = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: ['Consumo sem FV', 'Consumo com FV'],
-        datasets: [{
-          label: 'kWh por ano',
-          data: [semFV, Math.max(semFV - comFV, 0)],
-          backgroundColor: ['#e74c3c', '#2ecc71']
-        }]
+        labels: meses,
+        datasets: [
+          {
+            label: 'Consumo (kWh)',
+            data: consumoMensal,
+            backgroundColor: '#e74c3c'
+          },
+          {
+            label: 'Geração (kWh)',
+            data: geracaoMensal,
+            backgroundColor: '#2ecc71'
+          }
+        ]
       },
       options: {
         responsive: true,
         plugins: {
-          legend: { display: false },
-          title: { display: true, text: 'Comparativo de Consumo Anual' }
+          title: { display: true, text: 'Consumo vs. Geração Mensal (com sazonalidade)' }
         }
       }
     });
@@ -133,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     grafico2 = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: ['Consumo', 'Geração'],
+        labels: ['Consumo Médio', 'Geração Estimada'],
         datasets: [{
           data: [consumo, geracao],
           backgroundColor: ['#f39c12', '#3498db']
@@ -142,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function criarGraficoPayback(investimento, economiaAnual, payback) {
+  function criarGraficoPayback(investimento, economiaAnual) {
     if (grafico3) grafico3.destroy();
     const ctx = document.getElementById('graficoPaybackAcumulado').getContext('2d');
     const anos = Array.from({ length: 11 }, (_, i) => i);
