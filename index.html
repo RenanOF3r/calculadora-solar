@@ -1,198 +1,173 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Simulador Solar Fotovoltaico Avançado. Calcule o investimento, economia, sistema ideal e impacto ambiental com base no seu gasto mensal.">
-    <title>Simulador Solar Fotovoltaico Avançado</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-    <!-- Chart.js (Não renderizado no preview) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script> -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador Solar Fotovoltaico</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js" defer></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f7fa;
+      color: #2d3748;
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: #1a202c;
+      color: white;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+    }
+
+    form label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 600;
+    }
+
+    form input, form select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+      border: 1px solid #cbd5e0;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+    }
+
+    button[type="submit"] {
+      margin-top: 1.5rem;
+      padding: 0.75rem 1.5rem;
+      background-color: #2b6cb0;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .resultado p {
+      margin: 0.5rem 0;
+    }
+
+    .graficos {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    canvas {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+      padding: 0.5rem;
+      max-width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1><i class="fas fa-solar-panel"></i> Simulador Solar Fotovoltaico</h1>
-        <p>Descubra o sistema ideal e a economia para você!</p>
-    </header>
+  <header>
+    <h1>Simulador Solar Fotovoltaico</h1>
+    <p>Calcule economia, impacto ambiental e dimensionamento do sistema</p>
+  </header>
 
-    <main class="container">
+  <main>
+    <div class="grid">
+      <div class="card">
         <form id="calculadora-form">
+          <label for="estado">Estado</label>
+          <select id="estado" required>
+            <option value="">Selecione...</option>
+            <option value="RJ">Rio de Janeiro</option>
+            <option value="SP">São Paulo</option>
+            <option value="MG">Minas Gerais</option>
+            <option value="BA">Bahia</option>
+            <option value="CE">Ceará</option>
+          </select>
 
-            <section class="form-step">
-                <h2><span class="step-number">1</span> Informações do Local</h2>
-                <div class="input-group-row">
-                    <div class="input-group">
-                        <label>O local possui acesso à rede elétrica?</label>
-                        <div class="radio-like-group">
-                            <input type="radio" id="rede-sim" name="acesso_rede" value="sim" checked>
-                            <label for="rede-sim"><i class="fas fa-check"></i> Sim</label>
-                            <input type="radio" id="rede-nao" name="acesso_rede" value="nao">
-                            <label for="rede-nao"><i class="fas fa-times"></i> Não</label>
-                            <!-- Adicionar lógica JS se "Não" for selecionado (sistema off-grid é diferente) -->
-                        </div>
-                    </div>
-                </div>
-                 <div class="input-group-row location-group">
-                     <div class="input-group">
-                         <label for="estado">Estado:</label>
-                         <select id="estado" name="estado" required>
-                             <option value="">Selecione...</option>
-                             <option value="RJ">Rio de Janeiro</option>
-                             <option value="SP">São Paulo</option>
-                             <option value="MG">Minas Gerais</option>
-                             <option value="BA">Bahia</option>
-                             <option value="CE">Ceará</option>
-                             <!-- Adicionar mais estados -->
-                         </select>
-                         <span class="error-message" id="erro-estado"></span>
-                     </div>
-                     <div class="input-group">
-                         <label for="cidade">Cidade (HSP):</label>
-                         <select id="cidade" name="cidade" required disabled> <!-- Habilitar via JS após selecionar estado -->
-                             <option value="">Selecione o estado primeiro...</option>
-                             <!-- Opções preenchidas por JS -->
-                         </select>
-                         <span class="error-message" id="erro-cidade"></span>
-                     </div>
-                 </div>
-            </section>
+          <label for="cidade">Cidade</label>
+          <select id="cidade" disabled required>
+            <option value="">Selecione o estado primeiro...</option>
+          </select>
 
-            <section class="form-step">
-                 <h2><span class="step-number">2</span> Tipo de Imóvel</h2>
-                 <div class="icon-radio-group">
-                     <input type="radio" id="tipo-residencial" name="tipo_imovel" value="residencial" checked>
-                     <label for="tipo-residencial" class="icon-radio-label">
-                         <i class="fas fa-home"></i>
-                         <span>Residencial</span>
-                     </label>
-                     <input type="radio" id="tipo-comercial" name="tipo_imovel" value="comercial">
-                     <label for="tipo-comercial" class="icon-radio-label">
-                         <i class="fas fa-building"></i>
-                         <span>Comercial</span>
-                     </label>
-                      <input type="radio" id="tipo-industrial" name="tipo_imovel" value="industrial">
-                     <label for="tipo-industrial" class="icon-radio-label">
-                         <i class="fas fa-industry"></i>
-                         <span>Industrial</span>
-                     </label>
-                     <input type="radio" id="tipo-rural" name="tipo_imovel" value="rural">
-                     <label for="tipo-rural" class="icon-radio-label">
-                         <i class="fas fa-tractor"></i>
-                         <span>Rural</span>
-                     </label>
-                 </div>
-            </section>
+          <label for="gasto-mensal">Gasto Mensal (R$)</label>
+          <input type="number" id="gasto-mensal" value="500" min="50" step="0.01" required>
 
-             <section class="form-step">
-                 <h2><span class="step-number">3</span> Consumo e Tarifa</h2>
-                 <div class="slider-group">
-                     <label for="gasto-mensal">Quanto você paga em energia por mês?</label>
-                     <div class="slider-container">
-                         <span class="slider-icon-left"><i class="fas fa-bolt"></i></span>
-                         <input type="range" id="gasto-mensal" name="gasto_mensal" min="50" max="3000" value="500" step="10">
-                         <span class="slider-icon-right"><i class="fas fa-bolt"></i></span>
-                     </div>
-                     <output for="gasto-mensal" id="gasto-mensal-valor">R$ 500,00</output>
-                     <span class="error-message" id="erro-gasto"></span>
-                 </div>
+          <label for="tarifa">Tarifa (R$/kWh)</label>
+          <input type="number" id="tarifa" value="0.85" step="0.01" required>
 
-                 <div class="input-group-row tariff-group">
-                     <div class="input-group">
-                         <label for="tarifa">Sua Tarifa de Energia (R$/kWh):</label>
-                         <input type="number" id="tarifa" name="tarifa" min="0.10" max="3.00" step="0.01" value="0.85" required>
-                         <span class="error-message" id="erro-tarifa"></span>
-                     </div>
-                     <div class="input-group derived-value">
-                         <label>Consumo Mensal Estimado:</label>
-                         <span id="consumo-estimado" class="display-value">-- kWh</span>
-                     </div>
-                 </div>
-                 <!-- Poderia adicionar um checkbox "Alterar Tarifa" se ela fosse pré-preenchida -->
-            </section>
-
-            <button type="submit" id="botao-calcular">
-                <i class="fas fa-calculator"></i> Calcular Simulação
-            </button>
+          <button type="submit">Calcular</button>
         </form>
+      </div>
 
-        <section id="resultado-calculo" class="hidden"> <!-- Começa oculto -->
-            <h2><i class="fas fa-chart-line"></i> Sua Simulação Personalizada</h2>
-            <div class="resultados-container">
-                <!-- Coluna 1: Investimento -->
-                <div class="resultado-coluna">
-                    <div class="resultado-header">
-                        <i class="fas fa-dollar-sign"></i><h3>Investimento e Economia</h3>
-                    </div>
-                    <div class="resultado-card">
-                        <p>Investimento Estimado:</p>
-                        <strong id="resultado-investimento">R$ --</strong>
-                        <p>Economia Mensal Média:</p>
-                        <strong id="resultado-economia-mes">R$ --</strong>
-                        <p>Economia Total em 25 anos:</p>
-                        <strong id="resultado-economia-total">R$ --</strong>
-                        <p>Tempo de Retorno (Payback):</p>
-                        <strong id="resultado-payback">-- anos</strong>
-                        <button class="botao-secundario" id="ver-grafico-investimento">
-                            <i class="fas fa-chart-area"></i> Ver Gráfico Payback
-                        </button>
-                    </div>
-                </div>
+      <div class="card resultado hidden" id="resultado-calculo">
+        <h2>Resultados</h2>
+        <p><strong>Investimento:</strong> <span id="resultado-investimento">--</span></p>
+        <p><strong>Economia mensal:</strong> <span id="resultado-economia-mes">--</span></p>
+        <p><strong>Economia total:</strong> <span id="resultado-economia-total">--</span></p>
+        <p><strong>Payback:</strong> <span id="resultado-payback">--</span></p>
+        <p><strong>CO₂ evitado/ano:</strong> <span id="resultado-co2">--</span></p>
+        <p><strong>Árvores equivalentes:</strong> <span id="resultado-arvores">--</span></p>
+        <p><strong>Carro elétrico (km):</strong> <span id="resultado-km-carro">--</span></p>
+        <p><strong>Potência necessária:</strong> <span id="resultado-potencia">--</span></p>
+        <p><strong>Nº painéis:</strong> <span id="resultado-paineis">--</span></p>
+        <p><strong>Geração anual:</strong> <span id="resultado-geracao-anual">--</span></p>
+        <p><strong>Área mínima:</strong> <span id="resultado-area">--</span></p>
+        <p><strong>Peso estimado:</strong> <span id="resultado-peso">--</span></p>
+      </div>
+    </div>
 
-                <!-- Coluna 2: Ambiental -->
-                <div class="resultado-coluna">
-                     <div class="resultado-header">
-                        <i class="fas fa-leaf"></i><h3>Impacto Ambiental Positivo</h3>
-                    </div>
-                     <div class="resultado-card">
-                        <p>Redução de CO² por Ano:</p>
-                        <strong id="resultado-co2">-- kg</strong>
-                        <p>Equivalente a Árvores Plantadas (em 25 anos):</p>
-                        <strong id="resultado-arvores">-- árvores</strong>
-                        <p>Equivalente a KM rodados (Carro Elétrico/Ano):</p>
-                        <strong id="resultado-km-carro">-- km</strong>
-                    </div>
-                </div>
-
-                <!-- Coluna 3: Sistema Indicado -->
-                <div class="resultado-coluna">
-                     <div class="resultado-header">
-                        <i class="fas fa-solar-panel"></i><h3>Sistema Fotovoltaico Indicado</h3>
-                    </div>
-                     <div class="resultado-card">
-                        <p>Tamanho do Sistema (Potência):</p>
-                        <strong id="resultado-potencia">-- kWp</strong>
-                        <p>Número de Módulos (550Wp):</p>
-                        <strong id="resultado-paineis">--</strong>
-                         <p>Produção Anual Estimada:</p>
-                        <strong id="resultado-geracao-anual">-- kWh</strong>
-                        <p>Área Mínima Necessária:</p>
-                        <strong id="resultado-area">-- m²</strong>
-                        <p>Peso Estimado sobre o Telhado:</p>
-                        <strong id="resultado-peso">-- kg</strong>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Container para Gráficos de Resultado (inicialmente oculto) -->
-            <div id="graficos-resultado-container" class="hidden" style="margin-top: 2rem;">
-                 <h3>Gráficos Detalhados</h3>
-                 <canvas id="graficoPaybackAcumulado" style="margin-bottom: 2rem;"></canvas>
-                 <canvas id="graficoConsumoGeracao"></canvas>
-                 <!-- Adicionar mais canvas para outros gráficos se desejar -->
-            </div>
-
-            <div class="disclaimer">
-                <p><i class="fas fa-exclamation-triangle"></i> <strong>Atenção:</strong> Simulação com valores estimados para fins ilustrativos. Fatores como sombreamento, condições reais de instalação e custos específicos podem variar. Consulte um profissional para um projeto final.</p>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2025 Simulador Solar - Desenvolvido para fins educacionais.</p>
-    </footer>
-
-    <script src="script.js"></script> <!-- JS não executado no preview -->
+    <div class="graficos hidden" id="graficos-resultado-container">
+      <canvas id="graficoConsumoComparativo"></canvas>
+      <canvas id="graficoPaybackAcumulado"></canvas>
+      <canvas id="graficoConsumoGeracao"></canvas>
+    </div>
+  </main>
 </body>
 </html>
